@@ -6,15 +6,42 @@
  * @flow
  */
 
-import React from 'react';
+import React, {Component} from 'react';
 
 import Router from './src/config/router';
+import {withNavigation} from 'react-navigation';
 
-const App: () => React$Node = () => {
-  return (
-    <>
-      <Router />
-    </>
-  );
-};
-export default App;
+class App extends Component {
+  componentWillMount = () => {
+    this.IsLogin();
+  };
+
+  IsLogin = async () => {
+    try {
+      const getID = await AsyncStorage.getItem('ID');
+      console.log(getID);
+      if (getID != null) {
+        this.props.navigation.navigate('Home');
+      } else {
+        this.props.navigation.navigate('Login');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  render() {
+    return (
+      <>
+        <Router />
+      </>
+    );
+  }
+}
+// const App: () => React$Node = () => {
+//   return (
+//     <>
+
+//     </>
+//   );
+// };
+export default withNavigation(App);

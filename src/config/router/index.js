@@ -16,20 +16,6 @@ import {
   StatusOrder,
 } from '../../containers/pages';
 
-IsLogin = async () => {
-  try {
-    const getID = await AsyncStorage.getItem('ID');
-    console.log(getID);
-    if (getID != null) {
-      this.props.navigation.navigate('Home');
-    } else {
-      this.props.navigation.navigate('Login');
-    }
-  } catch (error) {
-    console.log(error);
-  }
-};
-
 const HomeStack = createStackNavigator(
   {
     Home,
