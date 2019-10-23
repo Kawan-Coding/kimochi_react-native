@@ -3,37 +3,51 @@ import React, {Component} from 'react';
 import {View, Text, StyleSheet, Image} from 'react-native';
 
 import avatar from '../assets/img/man.png';
-export default class HeaderApp extends Component {
-  render() {
-    return (
-      <>
-        <View style={styles.headerContainer}>
-          <View style={{flex: 1}}>
-            <View style={styles.headerItemsRound}>
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import {withNavigation} from 'react-navigation';
+
+import {IndonesiaDate} from '../config/utilities/IndonesiaDate';
+import '../config/router';
+const HeaderApp = props => {
+  let date = IndonesiaDate(new Date());
+  return (
+    <>
+      <View style={styles.headerContainer}>
+        <View style={{flex: 1}}>
+          <View style={styles.headerItemsRound}>
+            <TouchableOpacity
+              onPress={() => props.navigation.navigate('CloseCashier')}>
               <Image source={avatar} style={styles.avatar} />
-            </View>
-          </View>
-          <View style={{flex: 1}}>
-            <View style={styles.headerItemsRound}>
-              <Image source={avatar} style={styles.avatar} />
-            </View>
-          </View>
-          <View style={{flex: 3}}>
-            <View style={styles.headerUsername}>
-              <Text style={styles.usernameText}>
-                Teman Koding /
-                <Text style={{color: '#fB5516'}}> Programmer</Text>
-              </Text>
-            </View>
-          </View>
-          <View style={{flex: 1}}>
-            <Text style={styles.headerDate}>Rabu 31 Juli 2019</Text>
+            </TouchableOpacity>
           </View>
         </View>
-      </>
-    );
-  }
-}
+        <View style={{flex: 1}}>
+          <View style={styles.headerItemsRound}>
+            <Image source={avatar} style={styles.avatar} />
+          </View>
+        </View>
+        <View style={{flex: 3}}>
+          <View style={styles.headerUsername}>
+            <Text style={styles.usernameText}>
+              Teman Koding /<Text style={{color: '#fB5516'}}> Programmer</Text>
+            </Text>
+          </View>
+        </View>
+        <View style={{flex: 1}}>
+          <Text style={styles.headerDate}>
+            {date.hari +
+              ', ' +
+              date.tanggal +
+              ' ' +
+              date.bulan +
+              ' ' +
+              date.tahun}{' '}
+          </Text>
+        </View>
+      </View>
+    </>
+  );
+};
 
 const styles = StyleSheet.create({
   headerContainer: {
@@ -73,3 +87,4 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
 });
+export default withNavigation(HeaderApp);

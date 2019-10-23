@@ -1,12 +1,16 @@
 import React, {Component} from 'react';
 import {Text, View, StyleSheet} from 'react-native';
-export default class Order extends Component {
+import BottomTab from '../../../component/BottomTab';
+import HeaderApp from '../../../component/HeaderApp';
+export default class Cashier extends Component {
   render() {
     return (
       <>
+        <HeaderApp />
         <View style={styles.container}>
-          <Text>Order</Text>
+          <Text>Cashier</Text>
         </View>
+        <BottomTab />
       </>
     );
   }
