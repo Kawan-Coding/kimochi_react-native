@@ -15,11 +15,29 @@ import bgOpenCashier from '../../../assets/img/bgOpenCashier.jpg';
 import userIcon from '../../../assets/img/user.png';
 import leftArrow from '../../../assets/img/leftArrow.png';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-export default class OpenCashier extends Component {
-  state = {
-    number: '10000',
-  };
 
+import {OpenCashierService} from '../../../config/service/Pegawai';
+import AsyncStorage from '@react-native-community/async-storage';
+
+export default class OpenCashier extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      number: '',
+    };
+  }
+
+  authCashier = async () => {
+    const responsible_id = await AsyncStorage.getItem('id');
+    const open_cash = this.state.number;
+    await OpenCashierService(responsible_id, open_cash).then(async result => {
+      if (result.data.error) {
+        console.log('Data tidak masuk');
+      } else {
+        this.props.navigation.navigate('Home');
+      }
+    });
+  };
   render() {
     var date = IndonesiaDate(new Date());
     return (
@@ -69,11 +87,14 @@ export default class OpenCashier extends Component {
                 <Text style={styles.currency}>Rp.</Text>
               </View>
               <View style={styles.formInput}>
-                <TextInput style={styles.Input} value={this.state.number} />
+                <TextInput
+                  style={styles.Input}
+                  value={this.state.number}
+                  onChange={number => this.setState({number: number})}
+                />
               </View>
             </View>
-            <TouchableOpacity
-              onPress={() => this.props.navigation.navigate('Home')}>
+            <TouchableOpacity onPress={() => authCashier()}>
               <View style={styles.btnWrap}>
                 <Text style={{color: '#fB5516'}}>OPEN CASHIER</Text>
               </View>

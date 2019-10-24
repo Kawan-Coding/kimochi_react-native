@@ -15,6 +15,8 @@ import AccoutMenu from '../../../component/AccountMenu';
 import axios from 'axios';
 import AsyncStorage from '@react-native-community/async-storage';
 
+import {GetProfile} from '../../../config/service/Pegawai';
+
 export default class Profile extends Component {
   constructor(props) {
     super(props);
@@ -24,27 +26,17 @@ export default class Profile extends Component {
     this.getProfile();
   }
   async getProfile() {
-    const formData = new FormData();
-    formData.append('id', await AsyncStorage.getItem('ID'));
-    return await axios({
-      url: 'http://kawankoding.kampungbudaya.com/sapi/pegawai/read',
-      method: 'POST',
-      data: formData,
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'multipart/form-data',
-      },
-    })
-      .then(res => {
-        this.setState(dataSource);
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    const id = await AsyncStorage.getItem('id');
+    await GetProfile(id).then(result => {
+      if (result.error) {
+        this.props.navigation.navigate('login');
+      } else {
+        this.setState({dataSource: result.data.data});
+      }
+    });
   }
   render() {
     const data = this.state.dataSource;
-    console.log(data);
     return (
       <>
         <HeaderApp />

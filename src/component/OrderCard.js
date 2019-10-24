@@ -6,7 +6,21 @@ import {withNavigation} from 'react-navigation';
 import {IndonesiaDate} from '../config/utilities/IndonesiaDate';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 const OrderCard = props => {
-  let date = IndonesiaDate(new Date());
+  let date = IndonesiaDate(props.create_at);
+  let transaction_status = '';
+  let process_status = '';
+  if (props.transaction_status == 'unpaid') {
+    transaction_status = 'red';
+  }
+  if (props.transaction_status == 'paid') {
+    transaction_status = '#43Af4A';
+  }
+  if (props.process_status == 'finish') {
+    process_status = 'purple';
+  }
+  if (props.process_status == 'process') {
+    process_status = 'blue';
+  }
   return (
     <>
       <View style={styles.cardTop}>
@@ -26,18 +40,25 @@ const OrderCard = props => {
         <View style={styles.cardContent}>
           <View style={{flex: 4, flexDirection: 'row'}}>
             <View style={{flex: 1, flexDirection: 'column'}}>
-              <DetailOrderCard title={'TR ID'} content={'TO_123456'} />
-              <DetailOrderCard title={'Customer'} content={'Atta Halilintar'} />
-              <DetailOrderCard title={'Customer ID'} content={'CST_12735735'} />
-              <DetailOrderCard title={'Telephone'} content={'081212831238'} />
+              <DetailOrderCard title={'TR_ID'} content={props.tr_id} />
+              <DetailOrderCard
+                title={'Customer'}
+                content={props.data_customer}
+              />
+              <DetailOrderCard
+                title={'Customer ID'}
+                content={props.customer_id}
+              />
+              <DetailOrderCard title={'Telephone'} content={props.telephone} />
             </View>
           </View>
           <View style={{flex: 1}}>
-            <Text style={[styles.status, {backgroundColor: 'red'}]}>
-              Unpaid
+            <Text
+              style={[styles.status, {backgroundColor: transaction_status}]}>
+              props.transaction_status
             </Text>
-            <Text style={[styles.status, {backgroundColor: 'blue'}]}>
-              Proccess
+            <Text style={[styles.status, {backgroundColor: process_status}]}>
+              Props.process_status
             </Text>
           </View>
         </View>

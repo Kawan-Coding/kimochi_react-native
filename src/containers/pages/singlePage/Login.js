@@ -15,22 +15,73 @@ import userIcon from '../../../assets/img/user.png';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {Auth} from '../../../config/service/Auth';
 import AsyncStorage from '@react-native-community/async-storage';
-export default class Login extends Component {
+
+class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
       username: '',
       password: '',
-      data: [],
+      data: '',
     };
+
     // this.IsLogin();
   }
 
   LoginService = async (username, password) => {
-    const dataService = await Auth(username, password);
-    console.log(dataService);
-    this.state.data.push(dataService);
-    // await AsyncStorage.setItem('ID', '22');
+    await Auth(username, password).then(async result => {
+      console.log(result);
+      if (result.data.error == false) {
+        console.log('mlebu');
+        try {
+          let data = result.data.data;
+
+          let cashStatus = data.cash_flow_status.status;
+          await AsyncStorage.setItem('id', data.responsible.pegawai.id);
+          await AsyncStorage.setItem(
+            'nama_lengkap',
+            data.responsible.pegawai.nama_lengkap,
+          );
+          await AsyncStorage.setItem(
+            'no_telepon',
+            data.responsible.pegawai.no_telepon,
+          );
+          await AsyncStorage.setItem('foto', data.responsible.pegawai.foto);
+          await AsyncStorage.setItem('cabang_id', data.responsible.cabang.id);
+          await AsyncStorage.setItem(
+            'cabang_nama',
+            data.responsible.cabang.nama,
+          );
+          await AsyncStorage.setItem(
+            'cabang_alamat',
+            data.responsible.cabang.alamat,
+          );
+          await AsyncStorage.setItem('cash_flow_status', cashStatus).then(
+            () => {
+              if (cashStatus == 'unvalidated') {
+                this.props.navigation.navigate('ValidationCheck');
+              }
+              if (cashStatus == 'progress') {
+                this.props.navigation.navigate('Home');
+              }
+              if (cashStatus == 'validated') {
+                this.props.navigation.navigate('OpenCashier');
+              }
+            },
+          );
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    });
+    // this.state.data = dataService.data;
+    // dataService = this.state.data;
+    // console.log(dataService.error);
+    // if (dataService.error == false) {
+    //   console.log('mlebu');
+    //   await AsyncStorage.setItem('ID', dataService.data.id);
+
+    // }
   };
 
   render() {
@@ -136,3 +187,5 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
 });
+
+export default Login;

@@ -32,11 +32,16 @@ export default class KimochiModal extends Component {
             {opacity: this.props.opacity ? 100 : 0},
           ]}>
           <View style={styles.modalHeader}>
-            <Image style={styles.modalImg} source={homeIcon} />
+            <Image style={styles.modalImg} source={this.props.icon} />
           </View>
           <View style={styles.modalContent}>
-            <Text>Some text here</Text>
-            <TouchableOpacity onPress={() => this.props.hide(false)}>
+            <Text>{this.props.message}</Text>
+            <TouchableOpacity
+              onPress={
+                this.props.link
+                  ? this.props.navigation.navigate(this.props.linkContent)
+                  : this.props.hide(false)
+              }>
               <View style={styles.modalBtn}>
                 <Text style={styles.btnText}>OK</Text>
               </View>

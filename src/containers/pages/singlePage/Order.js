@@ -6,7 +6,35 @@ import {ScrollView} from 'react-native-gesture-handler';
 
 import Search from '../../../assets/img/search.png';
 import OrderCard from '../../../component/OrderCard';
+import KimochiModal from '../../../component/KimochiModal';
+
+import {GetAllBarang} from '../../../config/service/Barang';
 export default class Order extends Component {
+  constructor(props) {
+    super(props);
+    state = {
+      data: '',
+    };
+    this.getBarang();
+  }
+  getBarang = async () => {
+    await GetAllBarang().then(result => {
+      if (result.data.error) {
+        console.log(result.data.message);
+      }
+      {
+        this.state.data = result.data;
+      }
+    });
+  };
+  displayOrderCard = () => {
+    let data = this.state.data.data;
+    // let items = data.map((item,key)=>{
+    // <OrderCard key={item.id} transaction_status ={} process_status={} create_at={} tr_id={} data_customer={} customer_id={} telephone={} onPress={this.modalTrigger()}/>
+    // })
+    // return items;
+  };
+  modalTrigger = async () => {};
   render() {
     return (
       <>
@@ -29,12 +57,7 @@ export default class Order extends Component {
           </View>
         </View>
         <ScrollView style={{paddingHorizontal: 20}}>
-          <OrderCard />
-          <OrderCard />
-          <OrderCard />
-          <OrderCard />
-          <OrderCard />
-          <OrderCard />
+          {this.displayOrderCard()}
         </ScrollView>
 
         <BottomTab />

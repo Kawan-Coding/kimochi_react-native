@@ -19,7 +19,8 @@ export default class ValidationCheck extends Component {
               paddingVertical: 20,
               paddingHorizontal: 10,
             }}>
-            <TouchableOpacity onPress={() => this.props.navigation.pop()}>
+            <TouchableOpacity
+              onPress={() => this.props.navigation.navigate('LoginStack')}>
               <Image source={leftArrow} style={styles.leftArrow} />
             </TouchableOpacity>
           </View>

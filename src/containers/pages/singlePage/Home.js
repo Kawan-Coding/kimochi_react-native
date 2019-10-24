@@ -17,9 +17,12 @@ import {
 
 import bgHome from '../../../assets/img/bgHome.jpg';
 import rocket from '../../../assets/img/speed.png';
+import userAdd from '../../../assets/img/userAdd.png';
 
 import DataHome from '../../../component/DataHome';
 import KimochiModal from '../../../component/KimochiModal';
+
+import {CheckCustomerNumber} from '../../../config/service/Pegawai';
 export default class Home extends Component {
   constructor(props) {
     super(props);
@@ -31,6 +34,39 @@ export default class Home extends Component {
   changeModalVisibility = bool => {
     this.setState({
       isModalVisible: bool,
+    });
+  };
+  checkCustomer = async number => {
+    await CheckCustomerNumber(number).then(result => {
+      if (result.data.error) {
+        return (
+          <>
+            <KimochiModal
+              opacity={this.state.isModalVisible}
+              hide={() => this.changeModalVisibility()}
+              message={
+                'Customer belum terdaftar di dalam sistem KIMOCHI GARAGE \n\n Silahkan daftar Customer'
+              }
+              icon={userAdd}
+              link={true}
+              linkContent={'DataCustomer'}
+            />
+          </>
+        );
+      } else {
+        return (
+          <KimochiModal
+            opacity={this.state.isModalVisible}
+            hide={() => this.changeModalVisibility()}
+            message={
+              'Customer telah terdaftar di dalam sistem KIMOCHI GARAGE \n\n Silahkan lanjut order'
+            }
+            icon={userAdd}
+            link={true}
+            linkContent={'Order'}
+          />
+        );
+      }
     });
   };
   render() {
@@ -59,7 +95,7 @@ export default class Home extends Component {
 
               <View style={styles.rocketWrap}>
                 <TouchableOpacity
-                  onPress={() => this.changeModalVisibility(true)}>
+                  onPress={this.checkCustomer(this.state.number)}>
                   <Image source={rocket} style={styles.rocketImg} />
                 </TouchableOpacity>
               </View>
@@ -79,7 +115,7 @@ export default class Home extends Component {
         <BottomTab />
         <KimochiModal
           opacity={this.state.isModalVisible}
-          hide={() => this.changeModalVisibility()}
+          hide={() => this.changeModalVisibility}
         />
       </>
     );

@@ -14,16 +14,18 @@ import {
   CloseCashier,
   NotifDetail,
   StatusOrder,
+  CustomerRegister,
 } from '../../containers/pages';
 
 const HomeStack = createStackNavigator(
   {
     Home,
-    ValidationCheck,
+    CustomerRegister,
     CloseCashier,
   },
   {
     headerMode: 'none',
+    initialRouteName: 'CustomerRegister',
   },
 );
 const OrderStack = createStackNavigator(
@@ -77,10 +79,11 @@ const Router = createSwitchNavigator(
     NotificationStack,
     ProfileStack,
     LoginStack,
+    ValidationCheck,
   },
   {
     headerMode: 'none',
-    initialRouteName: 'LoginStack',
+    initialRouteName: 'HomeStack',
   },
 );
 export default createAppContainer(Router);

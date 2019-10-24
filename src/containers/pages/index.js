@@ -9,6 +9,7 @@ import ValidationCheck from './singlePage/ValidationCheck';
 import CloseCashier from './singlePage/CloseCashier';
 import NotifDetail from './singlePage/NotifDetail';
 import StatusOrder from './singlePage/StatusOrder';
+import CustomerRegister from './singlePage/CustomerRegister';
 
 export {
   Home,
@@ -22,4 +23,5 @@ export {
   CloseCashier,
   NotifDetail,
   StatusOrder,
+  CustomerRegister,
 };

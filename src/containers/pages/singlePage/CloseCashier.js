@@ -15,14 +15,17 @@ import bgCloseCashier from '../../../assets/img/bgCloseCashier.jpg';
 import userIcon from '../../../assets/img/user.png';
 import leftArrow from '../../../assets/img/leftArrow.png';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-community/async-storage';
 
 import KimochiModal from '../../../component/KimochiModal';
+
+import {CloseCashierService} from '../../../config/service/Pegawai';
 export default class CloseCashier extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isModalVisible: false,
-      number: '10000',
+      number: '',
     };
   }
   changeModalVisibility = bool => {
@@ -31,8 +34,30 @@ export default class CloseCashier extends Component {
     });
   };
 
+  closeCashier = async () => {
+    const id = await AsyncStorage.getItem('id');
+    const close_cash = this.state.number;
+
+    await CloseCashierService(id, close_cash).then(res => {
+      if (res.data.error) {
+        console.log(res.data.message);
+      } else {
+        this.props.navigation.navigate('Home');
+      }
+    });
+  };
   render() {
     var date = IndonesiaDate(new Date());
+    let zona = '';
+    if (Date.jam >= 0 && date.jam < 12) {
+      zona = 'pagi';
+    }
+    if (Date.jam >= 12 && date.jam < 18) {
+      zona = 'siang';
+    }
+    if (Date.jam >= 18 && date.jam <= 24) {
+      zona = 'malam';
+    }
     return (
       <>
         <ImageBackground
@@ -55,7 +80,7 @@ export default class CloseCashier extends Component {
                   color: 'grey',
                   textAlign: 'right',
                 }}>
-                Selamat malam{'\n'}
+                Selamat {zona + '\n'}
                 <Text style={{color: 'white'}}>Nama Kasir</Text>
                 {'\n'}Selamat Bekerja
               </Text>
@@ -80,10 +105,14 @@ export default class CloseCashier extends Component {
                 <Text style={styles.currency}>Rp.</Text>
               </View>
               <View style={styles.formInput}>
-                <TextInput style={styles.Input} value={this.state.number} />
+                <TextInput
+                  style={styles.Input}
+                  value={this.state.number}
+                  onChange={number => this.setState({number: number})}
+                />
               </View>
             </View>
-            <TouchableOpacity onPress={() => this.changeModalVisibility(true)}>
+            <TouchableOpacity onPress={this.closeCashier()}>
               <View style={styles.btnWrap}>
                 <Text style={{color: '#fB5516'}}>CLOSE CASHIER</Text>
               </View>
