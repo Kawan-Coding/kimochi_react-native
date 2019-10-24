@@ -5,4 +5,4 @@ const GetAllBarang = async () => {
   return await RequestGet(url);
 };
 
-export default {GetAllBarang};
+export {GetAllBarang};

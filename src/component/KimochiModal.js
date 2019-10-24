@@ -4,6 +4,8 @@ import {View, Text, Image, StyleSheet, Dimensions} from 'react-native';
 
 import homeIcon from '../assets/img/home.png';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+
+import CustomerRegister from '../containers/pages/singlePage/CustomerRegister';
 export default class KimochiModal extends Component {
   constructor(props) {
     super(props);
@@ -16,6 +18,12 @@ export default class KimochiModal extends Component {
   }
   closeModal = () => {
     this.props.changeModalVisibility(false);
+  };
+
+  registerRedirect = () => {
+    console.log('masuk reditrect');
+    // this.props.hide(false);
+    // this.props.linkNavigation('RegisterCustomer');
   };
   render() {
     return (
@@ -39,7 +47,7 @@ export default class KimochiModal extends Component {
             <TouchableOpacity
               onPress={
                 this.props.link
-                  ? this.props.navigation.navigate(this.props.linkContent)
+                  ? this.props.linkNavigation()
                   : this.props.hide(false)
               }>
               <View style={styles.modalBtn}>

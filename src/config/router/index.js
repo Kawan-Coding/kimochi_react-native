@@ -20,12 +20,11 @@ import {
 const HomeStack = createStackNavigator(
   {
     Home,
-    CustomerRegister,
     CloseCashier,
+    CustomerRegister,
   },
   {
     headerMode: 'none',
-    initialRouteName: 'CustomerRegister',
   },
 );
 const OrderStack = createStackNavigator(
@@ -83,7 +82,7 @@ const Router = createSwitchNavigator(
   },
   {
     headerMode: 'none',
-    initialRouteName: 'HomeStack',
+    initialRouteName: 'LoginStack',
   },
 );
 export default createAppContainer(Router);

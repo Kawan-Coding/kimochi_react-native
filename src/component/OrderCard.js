@@ -55,10 +55,10 @@ const OrderCard = props => {
           <View style={{flex: 1}}>
             <Text
               style={[styles.status, {backgroundColor: transaction_status}]}>
-              props.transaction_status
+              {props.transaction_status}
             </Text>
             <Text style={[styles.status, {backgroundColor: process_status}]}>
-              Props.process_status
+              {props.process_status}
             </Text>
           </View>
         </View>

@@ -28,7 +28,8 @@ export default class Home extends Component {
     super(props);
     this.state = {
       isModalVisible: false,
-      number: '',
+      number: '08203490',
+      modalStatus: '',
     };
   }
   changeModalVisibility = bool => {
@@ -37,39 +38,63 @@ export default class Home extends Component {
     });
   };
   checkCustomer = async number => {
+    console.log('mlebu');
     await CheckCustomerNumber(number).then(result => {
+      console.log(result.data);
       if (result.data.error) {
-        return (
-          <>
-            <KimochiModal
-              opacity={this.state.isModalVisible}
-              hide={() => this.changeModalVisibility()}
-              message={
-                'Customer belum terdaftar di dalam sistem KIMOCHI GARAGE \n\n Silahkan daftar Customer'
-              }
-              icon={userAdd}
-              link={true}
-              linkContent={'DataCustomer'}
-            />
-          </>
-        );
+        console.log('mlebu error');
+
+        this.setState({modalStatus: 'unregistered'});
+        this.displayModal();
       } else {
-        return (
-          <KimochiModal
-            opacity={this.state.isModalVisible}
-            hide={() => this.changeModalVisibility()}
-            message={
-              'Customer telah terdaftar di dalam sistem KIMOCHI GARAGE \n\n Silahkan lanjut order'
-            }
-            icon={userAdd}
-            link={true}
-            linkContent={'Order'}
-          />
-        );
+        console.log('mlebu gak error');
+        this.setState({modalStatus: 'registered'});
+        this.displayModal();
       }
     });
   };
+  redirectRegister = () => {
+    this.changeModalVisibility(false);
+    this.props.navigation.navigate('CustomerRegister');
+  };
+  displayModal = () => {
+    this.changeModalVisibility(true);
+
+    console.log('mlebu display modal');
+  };
   render() {
+    let kimochimodal;
+    if (this.state.modalStatus == 'unregistered') {
+      console.log('mlebu unregistered');
+
+      kimochimodal = (
+        <KimochiModal
+          opacity={this.state.isModalVisible}
+          hide={() => this.changeModalVisibility}
+          message={
+            'Customer belum terdaftar di dalam sistem KIMOCHI GARAGE \n\n Silahkan daftar Customer'
+          }
+          icon={userAdd}
+          link={true}
+          linkContent={'DataCustomer'}
+          linkNavigation={() => this.redirectRegister}
+        />
+      );
+    }
+    if (this.state.modalStatus == 'registered') {
+      kimochimodal = (
+        <KimochiModal
+          opacity={this.state.isModalVisible}
+          hide={this.changeModalVisibility}
+          message={
+            'Customer telah terdaftar di dalam sistem KIMOCHI GARAGE \n\n Silahkan lanjut order'
+          }
+          icon={userAdd}
+          link={true}
+          linkContent={'Order'}
+        />
+      );
+    }
     return (
       <>
         <HeaderApp />
@@ -95,7 +120,7 @@ export default class Home extends Component {
 
               <View style={styles.rocketWrap}>
                 <TouchableOpacity
-                  onPress={this.checkCustomer(this.state.number)}>
+                  onPress={() => this.checkCustomer(this.state.number)}>
                   <Image source={rocket} style={styles.rocketImg} />
                 </TouchableOpacity>
               </View>
@@ -113,10 +138,11 @@ export default class Home extends Component {
           </ScrollView>
         </ImageBackground>
         <BottomTab />
-        <KimochiModal
+        {kimochimodal}
+        {/* <KimochiModal
           opacity={this.state.isModalVisible}
           hide={() => this.changeModalVisibility}
-        />
+        /> */}
       </>
     );
   }

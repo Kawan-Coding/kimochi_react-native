@@ -30,6 +30,7 @@ const RequestGet = async url => {
     },
   })
     .then(res => {
+      console.log(res);
       return res;
     })
     .catch(error => {

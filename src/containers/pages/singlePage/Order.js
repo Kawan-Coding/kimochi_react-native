@@ -12,28 +12,28 @@ import {GetAllBarang} from '../../../config/service/Barang';
 export default class Order extends Component {
   constructor(props) {
     super(props);
-    state = {
+    this.state = {
       data: '',
     };
     this.getBarang();
   }
   getBarang = async () => {
     await GetAllBarang().then(result => {
+      console.log(result);
       if (result.data.error) {
         console.log(result.data.message);
-      }
-      {
+      } else {
         this.state.data = result.data;
       }
     });
   };
-  displayOrderCard = () => {
-    let data = this.state.data.data;
-    // let items = data.map((item,key)=>{
-    // <OrderCard key={item.id} transaction_status ={} process_status={} create_at={} tr_id={} data_customer={} customer_id={} telephone={} onPress={this.modalTrigger()}/>
-    // })
-    // return items;
-  };
+  // displayOrderCard = () => {
+  //   let data = this.state.data.data;
+  //   let items = data.map((item,key)=>{
+  //   <OrderCard key={item.id} transaction_status ={} process_status={} create_at={} tr_id={} data_customer={} customer_id={} telephone={} onPress={this.modalTrigger()}/>
+  //   })
+  //   return items;
+  // };
   modalTrigger = async () => {};
   render() {
     return (
@@ -57,7 +57,17 @@ export default class Order extends Component {
           </View>
         </View>
         <ScrollView style={{paddingHorizontal: 20}}>
-          {this.displayOrderCard()}
+          <OrderCard
+            transaction_status={'paid'}
+            process_status={'finish'}
+            create_at={new Date()}
+            tr_id={'TO_123456'}
+            data_customer={'KAwan Koding'}
+            customer_id={'CST_123456'}
+            telephone={'0909898'}
+            onPress={this.modalTrigger()}
+          />
+          {/* {this.displayOrderCard()} */}
         </ScrollView>
 
         <BottomTab />

@@ -38,11 +38,12 @@ export default class CloseCashier extends Component {
     const id = await AsyncStorage.getItem('id');
     const close_cash = this.state.number;
 
-    await CloseCashierService(id, close_cash).then(res => {
+    await CloseCashierService(id, close_cash).then(async res => {
       if (res.data.error) {
         console.log(res.data.message);
       } else {
-        this.props.navigation.navigate('Home');
+        await AsyncStorage.clear();
+        this.props.navigation.navigate('Login');
       }
     });
   };
@@ -130,7 +131,7 @@ export default class CloseCashier extends Component {
         </ImageBackground>
         <KimochiModal
           opacity={this.state.isModalVisible}
-          hide={() => this.changeModalVisibility()}
+          hide={() => this.changeModalVisibility}
         />
       </>
     );
