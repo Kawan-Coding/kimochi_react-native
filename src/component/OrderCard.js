@@ -35,8 +35,7 @@ const OrderCard = props => {
           </Text>
         </View>
       </View>
-      <TouchableOpacity
-        onPress={() => props.navigation.navigate('StatusOrder')}>
+      <TouchableOpacity onPress={() => props.navigation.navigate(props.link)}>
         <View style={styles.cardContent}>
           <View style={{flex: 4, flexDirection: 'row'}}>
             <View style={{flex: 1, flexDirection: 'column'}}>

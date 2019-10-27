@@ -65,7 +65,8 @@ export default class Order extends Component {
             data_customer={'KAwan Koding'}
             customer_id={'CST_123456'}
             telephone={'0909898'}
-            onPress={this.modalTrigger()}
+            link={'StatusOrder'}
+            // onPress={this.modalTrigger()}
           />
           {/* {this.displayOrderCard()} */}
         </ScrollView>

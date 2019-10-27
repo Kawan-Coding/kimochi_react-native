@@ -57,6 +57,10 @@ export default class Home extends Component {
     this.changeModalVisibility(false);
     this.props.navigation.navigate('CustomerRegister');
   };
+  redirectOrder = () => {
+    this.changeModalVisibility(false);
+    this.props.navigation.navigate('CustomerOrder');
+  };
   displayModal = () => {
     this.changeModalVisibility(true);
 
@@ -75,9 +79,8 @@ export default class Home extends Component {
             'Customer belum terdaftar di dalam sistem KIMOCHI GARAGE \n\n Silahkan daftar Customer'
           }
           icon={userAdd}
-          link={true}
-          linkContent={'DataCustomer'}
-          linkNavigation={() => this.redirectRegister}
+          option={false}
+          function={() => this.redirectRegister}
         />
       );
     }
@@ -90,8 +93,8 @@ export default class Home extends Component {
             'Customer telah terdaftar di dalam sistem KIMOCHI GARAGE \n\n Silahkan lanjut order'
           }
           icon={userAdd}
-          link={true}
-          linkContent={'Order'}
+          option={false}
+          function={this.redirectOrder}
         />
       );
     }

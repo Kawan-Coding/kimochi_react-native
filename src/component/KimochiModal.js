@@ -25,13 +25,41 @@ export default class KimochiModal extends Component {
     // this.props.hide(false);
     // this.props.linkNavigation('RegisterCustomer');
   };
+
   render() {
+    let option = '';
+    if (this.props.option) {
+      option = (
+        <View style={{flexDirection: 'row'}}>
+          <TouchableOpacity onPress={this.props.hide(false)}>
+            <View style={styles.modalBtnNo}>
+              <Text style={styles.btnTextNo}>TIDAK</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => this.props.function()}>
+            <View style={styles.modalBtn}>
+              <Text style={styles.btnText}>YA</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      );
+    } else {
+      option = (
+        <>
+          <TouchableOpacity onPress={() => this.props.function()}>
+            <View style={styles.modalBtn}>
+              <Text style={styles.btnText}>OK</Text>
+            </View>
+          </TouchableOpacity>
+        </>
+      );
+    }
     return (
       <>
         <View
           style={[
             styles.overlay,
-            {opacity: this.props.opacity ? 0.5 : 0},
+            {opacity: this.props.opacity ? 0.75 : 0},
           ]}></View>
         <View
           style={[
@@ -44,16 +72,7 @@ export default class KimochiModal extends Component {
           </View>
           <View style={styles.modalContent}>
             <Text>{this.props.message}</Text>
-            <TouchableOpacity
-              onPress={
-                this.props.link
-                  ? this.props.linkNavigation()
-                  : this.props.hide(false)
-              }>
-              <View style={styles.modalBtn}>
-                <Text style={styles.btnText}>OK</Text>
-              </View>
-            </TouchableOpacity>
+            {option}
           </View>
         </View>
       </>
@@ -107,12 +126,26 @@ const styles = StyleSheet.create({
   modalBtn: {
     paddingVertical: 10,
     paddingHorizontal: 20,
-    width: 150,
+    width: 100,
     backgroundColor: '#fB5516',
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 10,
     marginVertical: 20,
+    marginHorizontal: 15,
+  },
+  modalBtnNo: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    width: 100,
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+    marginVertical: 20,
+    marginHorizontal: 15,
+    borderColor: '#cccccc',
+    borderWidth: 1,
   },
   btnText: {
     color: 'white',

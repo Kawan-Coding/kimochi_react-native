@@ -15,6 +15,7 @@ import {
   NotifDetail,
   StatusOrder,
   CustomerRegister,
+  CashierPayment,
 } from '../../containers/pages';
 
 const HomeStack = createStackNavigator(
@@ -39,9 +40,11 @@ const OrderStack = createStackNavigator(
 const CashierStack = createStackNavigator(
   {
     Cashier,
+    CashierPayment,
   },
   {
     headerMode: 'none',
+    initialRouteName: 'Cashier',
   },
 );
 const NotificationStack = createStackNavigator(
@@ -82,7 +85,7 @@ const Router = createSwitchNavigator(
   },
   {
     headerMode: 'none',
-    initialRouteName: 'LoginStack',
+    initialRouteName: 'HomeStack',
   },
 );
 export default createAppContainer(Router);

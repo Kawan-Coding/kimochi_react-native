@@ -10,6 +10,7 @@ import CloseCashier from './singlePage/CloseCashier';
 import NotifDetail from './singlePage/NotifDetail';
 import StatusOrder from './singlePage/StatusOrder';
 import CustomerRegister from './singlePage/CustomerRegister';
+import CashierPayment from './singlePage/CashierPayment';
 
 export {
   Home,
@@ -24,4 +25,5 @@ export {
   NotifDetail,
   StatusOrder,
   CustomerRegister,
+  CashierPayment,
 };

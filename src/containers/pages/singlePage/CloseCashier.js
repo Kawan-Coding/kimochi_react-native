@@ -113,7 +113,7 @@ export default class CloseCashier extends Component {
                 />
               </View>
             </View>
-            <TouchableOpacity onPress={this.closeCashier()}>
+            <TouchableOpacity onPress={this.closeCashier}>
               <View style={styles.btnWrap}>
                 <Text style={{color: '#fB5516'}}>CLOSE CASHIER</Text>
               </View>
