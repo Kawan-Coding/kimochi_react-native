@@ -1,6 +1,13 @@
 import React, {Component} from 'react';
 
-import {View, Text, Image, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  Dimensions,
+  TextInput,
+} from 'react-native';
 
 import DetailTop from '../../../component/DetailTop';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
@@ -12,29 +19,81 @@ import Money from '../../../assets/img/money.png';
 import Checked from '../../../assets/img/checked.png';
 
 import KimochiModal from '../../../component/KimochiModal';
+import CouponSheet from '../../../component/CouponSheet';
+import DiscountSheet from '../../../component/DiscountSheet';
+import PaymentSheet from '../../../component/PaymentSheet';
+
 export default class CashierPayment extends Component {
   constructor(props) {
     super(props);
     this.state = {
       totalAwal: 20000,
+      totalAkhir: 18000,
+      overlayVisible: false,
       discountVisible: false,
       discountChoosen: false,
-      totalAkhir: 18000,
+      discountValue: '',
+      discountCardText: '',
+      couponVisible: false,
+      couponChoosen: false,
+      couponValue: '',
+      couponCardText: '',
+      paymentVisible: false,
+      paymentChoosen: false,
+      paymentValue: '',
+      paymentCardText: '',
       isModalVisible: false,
     };
     this.changeDiscountVisibility = this.changeDiscountVisibility.bind(this);
     this.changeModalVisibility = this.changeModalVisibility.bind(this);
+    this.changeCouponVisibility = this.changeCouponVisibility.bind(this);
+    this.changePaymentVisibility = this.changePaymentVisibility.bind(this);
+
     this.confirmPayment = this.confirmPayment.bind(this);
     this.chooseDiscount = this.chooseDiscount.bind(this);
+    this.chooseCoupon = this.chooseCoupon.bind(this);
+    this.choosePayment = this.choosePayment.bind(this);
   }
-
+  changeOverlayVisibility = visible => {
+    this.setState({overlayVisible: visible});
+  };
+  closeOverlay = () => {
+    console.log('masuk close');
+    this.setState({
+      overlayVisible: false,
+      discountVisible: false,
+      couponVisible: false,
+      paymentVisible: false,
+    });
+  };
   changeDiscountVisibility = visible => {
-    console.log('masuk visibility');
+    this.changeOverlayVisibility(true);
     this.setState({discountVisible: visible});
   };
-  chooseDiscount = visible => {
+  chooseDiscount = (visible, discountValue, discountCardText) => {
     this.changeDiscountVisibility(false);
-    this.setState({discountChoosen: visible});
+    this.changeOverlayVisibility(false);
+    this.setState({
+      discountChoosen: visible,
+      discountValue: discountValue,
+      discountCardText: discountCardText,
+    });
+  };
+  changeCouponVisibility = visible => {
+    this.changeOverlayVisibility(true);
+    this.setState({couponVisible: visible});
+  };
+  chooseCoupon = visible => {
+    this.changeCouponVisibility(false);
+    this.setState({couponChoosen: visible});
+  };
+  changePaymentVisibility = visible => {
+    this.changeOverlayVisibility(true);
+    this.setState({paymentVisible: visible});
+  };
+  choosePayment = visible => {
+    this.changeCouponVisibility(false);
+    this.setState({paymentChoosen: visible});
   };
   changeModalVisibility = bool => {
     this.setState({
@@ -45,17 +104,33 @@ export default class CashierPayment extends Component {
     console.log('confirm payment');
     this.changeModalVisibility(false);
   };
+  componentDidMount = () => {};
   render() {
-    let discountText = '';
-    let discountCardText = 'Discount';
+    let discountValue = 'Discount';
+    let discountCardText = '';
     if (this.state.discountChoosen) {
-      discountText = 'Voucher Discount Agustus';
-      discountCardText = 'Rp. 5000';
+      if (this.state.discountValue > 1) {
+        discountValue = 'Rp. ' + this.state.discountValue;
+      }
+
+      discountCardText = this.state.discountCardText;
     }
+    let couponValue = 'Coupon';
+    let couponCardText = '';
+
+    let paymentValue = 'Payment';
+    let paymentCardText = '';
     return (
       <>
+        <View
+          style={[
+            {display: this.state.overlayVisible ? 'flex' : 'none', zIndex: 2},
+          ]}>
+          <View style={[styles.overlay, {zIndex: 2}]}></View>
+        </View>
+
         <DetailTop title="Cashier-Payment" />
-        <View style={{padding: 10, flex: 1}}>
+        <View style={{padding: 10, flex: 1, zIndex: 1}}>
           <ScrollView style={{flex: 1}}>
             <MemberCard
               tr_id={'TO_1234567'}
@@ -67,18 +142,25 @@ export default class CashierPayment extends Component {
             />
             <TouchableOpacity
               onPress={() => this.changeDiscountVisibility('flex')}>
-              <PaymentCard image={Discount} type={discountCardText} />
+              <PaymentCard image={Discount} type={discountValue} />
             </TouchableOpacity>
             <Text
               style={{
                 color: 'purple',
                 display: this.state.discountChoosen ? 'flex' : 'none',
               }}>
-              {discountText}
+              {discountCardText}
             </Text>
-            <PaymentCard image={Voucher} type={'Coupon'} />
-            <PaymentCard image={Bill} type={'Payment'} />
+            <TouchableOpacity
+              onPress={() => this.changeCouponVisibility('flex')}>
+              <PaymentCard image={Voucher} type={couponValue} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => this.changePaymentVisibility('flex')}>
+              <PaymentCard image={Bill} type={paymentValue} />
+            </TouchableOpacity>
             <PaymentCard image={Money} type={'Bonus'} />
+            <TextInput value={'123'} />
           </ScrollView>
         </View>
         <PaymentBtn
@@ -86,8 +168,35 @@ export default class CashierPayment extends Component {
           kembalian={this.state.totalAwal - this.state.totalAkhir}
           function={this.changeModalVisibility}
         />
-        <View style={{display: this.state.discountVisible ? 'flex' : 'none'}}>
-          <DiscountSheet function={this.chooseDiscount} />
+        <View
+          style={{
+            display: this.state.discountVisible ? 'flex' : 'none',
+            zIndex: 100,
+            position: 'relative',
+          }}>
+          <DiscountSheet
+            function={this.chooseDiscount}
+            close={this.closeOverlay}
+          />
+        </View>
+        <View
+          style={{
+            display: this.state.paymentVisible ? 'flex' : 'none',
+            zIndex: 100,
+            position: 'relative',
+          }}>
+          <PaymentSheet
+            function={this.choosePayment}
+            close={this.closeOverlay}
+          />
+        </View>
+        <View
+          style={{
+            display: this.state.couponVisible ? 'flex' : 'none',
+            position: 'relative',
+            zIndex: 100,
+          }}>
+          <CouponSheet function={this.chooseCoupon} close={this.closeOverlay} />
         </View>
         <KimochiModal
           opacity={this.state.isModalVisible}
@@ -212,106 +321,17 @@ const BtnConfirm = props => {
   );
 };
 
-const DiscountSheet = props => {
-  return (
-    <>
-      <View
-        style={{
-          flex: 1,
-          height: 500,
-          width: '100%',
-          position: 'absolute',
-          bottom: 0,
-        }}>
-        <SheetTitle title={'Voucher Discount'} />
-        <ScrollView style={{flex: 1, backgroundColor: 'white', padding: 20}}>
-          <DiscountCard
-            title={'Voucher Diskon Agustus'}
-            content={'Syarat menunjukkan KTP Kemudian KTP di Foto'}
-            amount={'Rp.5000'}
-            function={props.function}
-          />
-          <DiscountCard
-            title={'Voucher Diskon Agustus'}
-            content={'Syarat menunjukkan KTP Kemudian KTP di Foto'}
-            amount={'Rp.5000'}
-            function={props.function}
-          />
-          <DiscountCard
-            title={'Voucher Diskon Agustus'}
-            content={'Syarat menunjukkan KTP Kemudian KTP di Foto'}
-            amount={'Rp.5000'}
-            function={props.function}
-          />
-          <DiscountCard
-            title={'Voucher Diskon Agustus'}
-            content={'Syarat menunjukkan KTP Kemudian KTP di Foto'}
-            amount={'Rp.5000'}
-            function={props.function}
-          />
-          <DiscountCard
-            title={'Voucher Diskon Agustus'}
-            content={'Syarat menunjukkan KTP Kemudian KTP di Foto'}
-            amount={'Rp.5000'}
-            function={props.function}
-          />
-          <DiscountCard
-            title={'Voucher Diskon Agustus'}
-            content={'Syarat menunjukkan KTP Kemudian KTP di Foto'}
-            amount={'Rp.5000'}
-            function={props.function}
-          />
-          <DiscountCard
-            title={'Voucher Diskon Agustus'}
-            content={'Syarat menunjukkan KTP Kemudian KTP di Foto'}
-            amount={'Rp.5000'}
-            function={props.function}
-          />
-        </ScrollView>
-      </View>
-    </>
-  );
-};
-const SheetTitle = props => {
-  return (
-    <View style={styles.sheet}>
-      <Text style={{color: 'white'}}>{props.title}</Text>
-    </View>
-  );
-};
-const DiscountCard = props => {
-  return (
-    <View style={styles.discountCard}>
-      <View style={{flex: 2}}>
-        <Text style={{fontWeight: 'bold', color: 'purple', fontSize: 16}}>
-          {props.title}
-        </Text>
-        <Text style={{fontSize: 12}}>{props.content}</Text>
-      </View>
-      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-        <Text style={{color: '#fB5516', fontWeight: 'bold', fontSize: 22}}>
-          {props.amount}
-        </Text>
-        <View
-          style={{
-            paddingVertical: 7,
-            width: 100,
-            backgroundColor: '#43Af4A',
-            borderRadius: 25,
-            marginTop: 10,
-          }}>
-          <TouchableOpacity onPress={() => props.function(true)}>
-            <Text
-              style={{textAlign: 'center', color: 'white', fontWeight: 'bold'}}>
-              Pilih
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
-  );
-};
 const styles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    backgroundColor: 'black',
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
+    opacity: 0.75,
+  },
   memberCard: {
     padding: 10,
     borderRadius: 10,
@@ -319,26 +339,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginVertical: 5,
   },
-  discountCard: {
-    flex: 1,
-    flexDirection: 'row',
-    borderColor: '#cccccc',
-    borderWidth: 1,
-    borderRadius: 25,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    marginBottom: 15,
-  },
-  sheet: {
-    height: 50,
-    width: '100%',
-    backgroundColor: 'black',
-    opacity: 0.8,
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-  },
+
   textBold: {
     fontWeight: 'bold',
     fontSize: 18,

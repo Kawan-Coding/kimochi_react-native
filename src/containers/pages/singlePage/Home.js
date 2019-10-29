@@ -27,7 +27,7 @@ export default class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isModalVisible: false,
+      isModalVisible: '',
       number: '08203490',
       modalStatus: '',
     };
@@ -38,16 +38,11 @@ export default class Home extends Component {
     });
   };
   checkCustomer = async number => {
-    console.log('mlebu');
     await CheckCustomerNumber(number).then(result => {
-      console.log(result.data);
       if (result.data.error) {
-        console.log('mlebu error');
-
         this.setState({modalStatus: 'unregistered'});
         this.displayModal();
       } else {
-        console.log('mlebu gak error');
         this.setState({modalStatus: 'registered'});
         this.displayModal();
       }
@@ -63,14 +58,10 @@ export default class Home extends Component {
   };
   displayModal = () => {
     this.changeModalVisibility(true);
-
-    console.log('mlebu display modal');
   };
   render() {
     let kimochimodal;
     if (this.state.modalStatus == 'unregistered') {
-      console.log('mlebu unregistered');
-
       kimochimodal = (
         <KimochiModal
           opacity={this.state.isModalVisible}
@@ -80,7 +71,7 @@ export default class Home extends Component {
           }
           icon={userAdd}
           option={false}
-          function={() => this.redirectRegister}
+          function={this.redirectRegister}
         />
       );
     }

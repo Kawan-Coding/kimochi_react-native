@@ -21,62 +21,68 @@ export default class KimochiModal extends Component {
   };
 
   registerRedirect = () => {
-    console.log('masuk reditrect');
     // this.props.hide(false);
     // this.props.linkNavigation('RegisterCustomer');
   };
 
   render() {
-    let option = '';
-    if (this.props.option) {
-      option = (
-        <View style={{flexDirection: 'row'}}>
-          <TouchableOpacity onPress={this.props.hide(false)}>
-            <View style={styles.modalBtnNo}>
-              <Text style={styles.btnTextNo}>TIDAK</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => this.props.function()}>
-            <View style={styles.modalBtn}>
-              <Text style={styles.btnText}>YA</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-      );
-    } else {
-      option = (
+    let modal;
+    console.log(this.props.opacity);
+    if (this.props.option == true && this.props.opacity == true) {
+      modal = (
         <>
-          <TouchableOpacity onPress={() => this.props.function()}>
-            <View style={styles.modalBtn}>
-              <Text style={styles.btnText}>OK</Text>
+          <View
+            style={[
+              styles.overlay,
+              {opacity: this.props.opacity ? 0.75 : 0},
+            ]}></View>
+          <View
+            style={[
+              styles.container,
+              styles.modal,
+              {display: this.props.opacity ? 'flex' : 'none'},
+            ]}>
+            <View style={styles.modalHeader}>
+              <Image style={styles.modalImg} source={this.props.icon} />
             </View>
-          </TouchableOpacity>
+            <View style={styles.modalContent}>
+              <Text>{this.props.message}</Text>
+            </View>
+          </View>
         </>
       );
     }
-    return (
-      <>
-        <View
-          style={[
-            styles.overlay,
-            {opacity: this.props.opacity ? 0.75 : 0},
-          ]}></View>
-        <View
-          style={[
-            styles.container,
-            styles.modal,
-            {opacity: this.props.opacity ? 100 : 0},
-          ]}>
-          <View style={styles.modalHeader}>
-            <Image style={styles.modalImg} source={this.props.icon} />
+    if (this.props.option == false && this.props.opacity == true) {
+      modal = (
+        <>
+          <View
+            style={[
+              styles.overlay,
+              {opacity: this.props.opacity ? 0.75 : 0},
+            ]}></View>
+          <View
+            style={[
+              styles.container,
+              styles.modal,
+              {display: this.props.opacity ? 'flex' : 'none'},
+            ]}>
+            <View style={styles.modalHeader}>
+              <Image style={styles.modalImg} source={this.props.icon} />
+            </View>
+            <View style={styles.modalContent}>
+              <Text>{this.props.message}</Text>
+              <TouchableOpacity onPress={() => this.props.function()}>
+                <View style={styles.modalBtn}>
+                  <Text style={styles.btnText}>OK</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
           </View>
-          <View style={styles.modalContent}>
-            <Text>{this.props.message}</Text>
-            {option}
-          </View>
-        </View>
-      </>
-    );
+        </>
+      );
+    }
+
+    return <>{modal}</>;
   }
 }
 
