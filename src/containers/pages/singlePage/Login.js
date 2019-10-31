@@ -12,9 +12,10 @@ import {
 
 import bgLogin from '../../../assets/img/bgLogin.jpg';
 import userIcon from '../../../assets/img/user.png';
+import locked from '../../../assets/img/locked.png';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {Auth} from '../../../config/service/Auth';
-import AsyncStorage from '@react-native-community/async-storage';
+import {SetItem, GetItem} from '../../../config/service/Storage';
 
 class Login extends Component {
   constructor(props) {
@@ -23,55 +24,58 @@ class Login extends Component {
       username: '',
       password: '',
       data: '',
+      invalid: false,
     };
 
     // this.IsLogin();
   }
 
+  changeInvalid = bool => {
+    this.setState({invalid: bool});
+  };
   LoginService = async (username, password) => {
     await Auth(username, password).then(async result => {
-      console.log(result);
       if (result.data.error == false) {
-        console.log('mlebu');
+        this.changeInvalid(false);
         try {
           let data = result.data.data;
 
-          let cashStatus = data.cash_flow_status.status;
-          await AsyncStorage.setItem('id', data.responsible.pegawai.id);
-          await AsyncStorage.setItem(
-            'nama_lengkap',
-            data.responsible.pegawai.nama_lengkap,
+          let cashStatus = data.cash_flow_status;
+          let cashId = data.cash_flow_id;
+          await SetItem('id', data.responsible.pegawai.id);
+          await SetItem('nama_lengkap', data.responsible.pegawai.nama_lengkap);
+          await SetItem('no_telepon', data.responsible.pegawai.no_telepon);
+          await SetItem('foto', data.responsible.pegawai.foto);
+          await SetItem('create_at', data.responsible.pegawai.create_at);
+          await SetItem('cabang_id', data.responsible.cabang.id);
+          await SetItem('cabang_nama', data.responsible.cabang.nama);
+
+          await SetItem('cabang_alamat', data.responsible.cabang.alamat);
+
+          await SetItem('cash_flow_status', cashStatus);
+          await SetItem('cash_flow_id', cashId);
+
+          await SetItem(
+            'id_responsible',
+            data.responsible.cabang.id_responsible,
           );
-          await AsyncStorage.setItem(
-            'no_telepon',
-            data.responsible.pegawai.no_telepon,
-          );
-          await AsyncStorage.setItem('foto', data.responsible.pegawai.foto);
-          await AsyncStorage.setItem('cabang_id', data.responsible.cabang.id);
-          await AsyncStorage.setItem(
-            'cabang_nama',
-            data.responsible.cabang.nama,
-          );
-          await AsyncStorage.setItem(
-            'cabang_alamat',
-            data.responsible.cabang.alamat,
-          );
-          await AsyncStorage.setItem('cash_flow_status', cashStatus).then(
-            () => {
-              if (cashStatus == 'unvalidated') {
-                this.props.navigation.navigate('ValidationCheck');
-              }
-              if (cashStatus == 'progress') {
-                this.props.navigation.navigate('Home');
-              }
-              if (cashStatus == 'validated') {
-                this.props.navigation.navigate('OpenCashier');
-              }
-            },
-          );
+
+          await SetItem('role', data.responsible.cabang.role).then(() => {
+            if (cashStatus == 'unvalidated') {
+              this.props.navigation.navigate('ValidationCheck');
+            }
+            if (cashStatus == 'progress') {
+              this.props.navigation.navigate('Home');
+            }
+            if (cashStatus == 'validated') {
+              this.props.navigation.navigate('OpenCashier');
+            }
+          });
         } catch (error) {
           console.log(error);
         }
+      } else {
+        this.changeInvalid(true);
       }
     });
     // this.state.data = dataService.data;
@@ -85,6 +89,14 @@ class Login extends Component {
   };
 
   render() {
+    let invalid;
+    if (this.state.invalid) {
+      invalid = (
+        <Text style={{color: 'red', textAlign: 'center', fontSize: 15}}>
+          Maaf username / password anda salah
+        </Text>
+      );
+    }
     return (
       <>
         <ImageBackground
@@ -105,7 +117,7 @@ class Login extends Component {
             </View>
             <View style={styles.loginForm}>
               <View style={styles.formImg}>
-                <Image source={userIcon} style={styles.iconImg} />
+                <Image source={locked} style={styles.iconImg} />
               </View>
               <View style={styles.formInput}>
                 <TextInput
@@ -116,6 +128,7 @@ class Login extends Component {
                 />
               </View>
             </View>
+            {invalid}
             <TouchableOpacity
               onPress={() =>
                 this.LoginService(this.state.username, this.state.password)

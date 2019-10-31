@@ -16,6 +16,14 @@ import {
   StatusOrder,
   CustomerRegister,
   CashierPayment,
+  CashRegister,
+  OmsetHariIni,
+  SetoranHariIni,
+  TransaksiHariIni,
+  HistoryTransaksi,
+  CouponSheet,
+  DiscountSheet,
+  PaymentSheet,
 } from '../../containers/pages';
 
 const HomeStack = createStackNavigator(
@@ -41,6 +49,9 @@ const CashierStack = createStackNavigator(
   {
     Cashier,
     CashierPayment,
+    CouponSheet,
+    DiscountSheet,
+    PaymentSheet,
   },
   {
     headerMode: 'none',
@@ -59,9 +70,15 @@ const NotificationStack = createStackNavigator(
 const ProfileStack = createStackNavigator(
   {
     Profile,
+    CashRegister,
+    OmsetHariIni,
+    SetoranHariIni,
+    TransaksiHariIni,
+    HistoryTransaksi,
   },
   {
     headerMode: 'none',
+    initialRouteName: 'Profile',
   },
 );
 const LoginStack = createStackNavigator(
@@ -85,7 +102,7 @@ const Router = createSwitchNavigator(
   },
   {
     headerMode: 'none',
-    initialRouteName: 'HomeStack',
+    initialRouteName: 'ProfileStack',
   },
 );
 export default createAppContainer(Router);

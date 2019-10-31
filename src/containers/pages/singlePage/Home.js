@@ -28,7 +28,7 @@ export default class Home extends Component {
     super(props);
     this.state = {
       isModalVisible: '',
-      number: '08203490',
+      number: '',
       modalStatus: '',
     };
   }
@@ -108,6 +108,7 @@ export default class Home extends Component {
                 <TextInput
                   style={styles.numInput}
                   value={this.state.number}
+                  keyboardType={'number-pad'}
                   onChangeText={number => this.setState({number: number})}
                 />
               </View>

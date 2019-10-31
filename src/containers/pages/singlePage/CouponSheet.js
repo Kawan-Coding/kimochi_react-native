@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {TextInput, View, Text, StyleSheet} from 'react-native';
-import SheetTitle from './SheetTitle';
+import SheetTitle from '../../../component/SheetTitle';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 
 export default class CouponSheet extends Component {
@@ -26,17 +26,20 @@ export default class CouponSheet extends Component {
   };
 
   render() {
+    const fun = this.props.navigation.state.params.function;
+    // fun();
     return (
       <>
         <View
           style={{
             flex: 1,
-            height: 500,
-            width: '100%',
-            position: 'absolute',
+
             bottom: 0,
           }}>
-          <SheetTitle title={'Voucher Coupon'} close={this.props.close} />
+          <SheetTitle
+            title={'Voucher Coupon'}
+            close={this.props.navigation.pop}
+          />
           <ScrollView style={{flex: 1, backgroundColor: 'white', padding: 20}}>
             <Text style={styles.labelInput}>Kode</Text>
 

@@ -11,6 +11,14 @@ import NotifDetail from './singlePage/NotifDetail';
 import StatusOrder from './singlePage/StatusOrder';
 import CustomerRegister from './singlePage/CustomerRegister';
 import CashierPayment from './singlePage/CashierPayment';
+import CashRegister from './singlePage/CashRegister';
+import OmsetHariIni from './singlePage/OmsetHariIni';
+import SetoranHariIni from './singlePage/SetoranHariIni';
+import TransaksiHariIni from './singlePage/TransaksiHariIni';
+import HistoryTransaksi from './singlePage/HistoryTransaksi';
+import CouponSheet from './singlePage/CouponSheet';
+import DiscountSheet from './singlePage/DiscountSheet';
+import PaymentSheet from './singlePage/PaymentSheet';
 
 export {
   Home,
@@ -26,4 +34,12 @@ export {
   StatusOrder,
   CustomerRegister,
   CashierPayment,
+  CashRegister,
+  OmsetHariIni,
+  SetoranHariIni,
+  TransaksiHariIni,
+  HistoryTransaksi,
+  CouponSheet,
+  DiscountSheet,
+  PaymentSheet,
 };

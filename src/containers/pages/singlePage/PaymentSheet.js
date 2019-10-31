@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {View, Text, Picker, StyleSheet, TextInput} from 'react-native';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 
-import SheetTitle from './SheetTitle';
+import SheetTitle from '../../../component/SheetTitle';
 
 export default class PaymentSheet extends Component {
   constructor(props) {
@@ -20,12 +20,8 @@ export default class PaymentSheet extends Component {
         <View
           style={{
             flex: 1,
-            height: 500,
-            width: '100%',
-            position: 'absolute',
-            bottom: 0,
           }}>
-          <SheetTitle title="Payment" close={this.props.close} />
+          <SheetTitle title="Payment" close={this.props.navigation.pop} />
           <ScrollView
             style={{
               flex: 1,

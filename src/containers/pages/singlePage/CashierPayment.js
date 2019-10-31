@@ -19,9 +19,6 @@ import Money from '../../../assets/img/money.png';
 import Checked from '../../../assets/img/checked.png';
 
 import KimochiModal from '../../../component/KimochiModal';
-import CouponSheet from '../../../component/CouponSheet';
-import DiscountSheet from '../../../component/DiscountSheet';
-import PaymentSheet from '../../../component/PaymentSheet';
 
 export default class CashierPayment extends Component {
   constructor(props) {
@@ -29,7 +26,6 @@ export default class CashierPayment extends Component {
     this.state = {
       totalAwal: 20000,
       totalAkhir: 18000,
-      overlayVisible: false,
       discountVisible: false,
       discountChoosen: false,
       discountValue: '',
@@ -54,45 +50,33 @@ export default class CashierPayment extends Component {
     this.chooseCoupon = this.chooseCoupon.bind(this);
     this.choosePayment = this.choosePayment.bind(this);
   }
-  changeOverlayVisibility = visible => {
-    this.setState({overlayVisible: visible});
-  };
-  closeOverlay = () => {
-    console.log('masuk close');
-    this.setState({
-      overlayVisible: false,
-      discountVisible: false,
-      couponVisible: false,
-      paymentVisible: false,
-    });
-  };
+
   changeDiscountVisibility = visible => {
-    this.changeOverlayVisibility(true);
     this.setState({discountVisible: visible});
   };
   chooseDiscount = (visible, discountValue, discountCardText) => {
     this.changeDiscountVisibility(false);
-    this.changeOverlayVisibility(false);
+
     this.setState({
       discountChoosen: visible,
       discountValue: discountValue,
       discountCardText: discountCardText,
     });
+    this.props.navigation.pop();
   };
   changeCouponVisibility = visible => {
-    this.changeOverlayVisibility(true);
     this.setState({couponVisible: visible});
   };
   chooseCoupon = visible => {
-    this.changeCouponVisibility(false);
+    console.log('choose coupon');
+
     this.setState({couponChoosen: visible});
+    this.props.navigation.pop();
   };
   changePaymentVisibility = visible => {
-    this.changeOverlayVisibility(true);
     this.setState({paymentVisible: visible});
   };
   choosePayment = visible => {
-    this.changeCouponVisibility(false);
     this.setState({paymentChoosen: visible});
   };
   changeModalVisibility = bool => {
@@ -122,12 +106,12 @@ export default class CashierPayment extends Component {
     let paymentCardText = '';
     return (
       <>
-        <View
+        {/* <View
           style={[
             {display: this.state.overlayVisible ? 'flex' : 'none', zIndex: 2},
           ]}>
           <View style={[styles.overlay, {zIndex: 2}]}></View>
-        </View>
+        </View> */}
 
         <DetailTop title="Cashier-Payment" />
         <View style={{padding: 10, flex: 1, zIndex: 1}}>
@@ -141,7 +125,11 @@ export default class CashierPayment extends Component {
               member={'Member Honda Kartika Sari'}
             />
             <TouchableOpacity
-              onPress={() => this.changeDiscountVisibility('flex')}>
+              onPress={() =>
+                this.props.navigation.navigate('DiscountSheet', {
+                  function: this.chooseDiscount,
+                })
+              }>
               <PaymentCard image={Discount} type={discountValue} />
             </TouchableOpacity>
             <Text
@@ -152,15 +140,22 @@ export default class CashierPayment extends Component {
               {discountCardText}
             </Text>
             <TouchableOpacity
-              onPress={() => this.changeCouponVisibility('flex')}>
+              onPress={() =>
+                this.props.navigation.navigate('CouponSheet', {
+                  function: this.chooseCoupon,
+                })
+              }>
               <PaymentCard image={Voucher} type={couponValue} />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => this.changePaymentVisibility('flex')}>
+              onPress={() =>
+                this.props.navigation.navigate('PaymentSheet', {
+                  function: this.choosePayment,
+                })
+              }>
               <PaymentCard image={Bill} type={paymentValue} />
             </TouchableOpacity>
             <PaymentCard image={Money} type={'Bonus'} />
-            <TextInput value={'123'} />
           </ScrollView>
         </View>
         <PaymentBtn
@@ -168,36 +163,15 @@ export default class CashierPayment extends Component {
           kembalian={this.state.totalAwal - this.state.totalAkhir}
           function={this.changeModalVisibility}
         />
-        <View
-          style={{
-            display: this.state.discountVisible ? 'flex' : 'none',
-            zIndex: 100,
-            position: 'relative',
-          }}>
-          <DiscountSheet
-            function={this.chooseDiscount}
-            close={this.closeOverlay}
-          />
-        </View>
-        <View
-          style={{
-            display: this.state.paymentVisible ? 'flex' : 'none',
-            zIndex: 100,
-            position: 'relative',
-          }}>
-          <PaymentSheet
-            function={this.choosePayment}
-            close={this.closeOverlay}
-          />
-        </View>
-        <View
+
+        {/* <View
           style={{
             display: this.state.couponVisible ? 'flex' : 'none',
             position: 'relative',
             zIndex: 100,
           }}>
           <CouponSheet function={this.chooseCoupon} close={this.closeOverlay} />
-        </View>
+        </View> */}
         <KimochiModal
           opacity={this.state.isModalVisible}
           hide={() => this.changeModalVisibility}

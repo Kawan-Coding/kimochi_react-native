@@ -35,10 +35,11 @@ export default class CloseCashier extends Component {
   };
 
   closeCashier = async () => {
-    const id = await AsyncStorage.getItem('id');
+    const id = await AsyncStorage.getItem('cash_flow_id');
     const close_cash = this.state.number;
-
+    console.log(close_cash);
     await CloseCashierService(id, close_cash).then(async res => {
+      console.log(res);
       if (res.data.error) {
         console.log(res.data.message);
       } else {
@@ -108,8 +109,9 @@ export default class CloseCashier extends Component {
               <View style={styles.formInput}>
                 <TextInput
                   style={styles.Input}
+                  keyboardType={'numeric'}
                   value={this.state.number}
-                  onChange={number => this.setState({number: number})}
+                  onChangeText={number => this.setState({number: number})}
                 />
               </View>
             </View>

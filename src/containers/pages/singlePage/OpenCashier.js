@@ -17,6 +17,7 @@ import leftArrow from '../../../assets/img/leftArrow.png';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 
 import {OpenCashierService} from '../../../config/service/Pegawai';
+import {SetItem, GetItem} from '../../../config/service/Storage';
 import AsyncStorage from '@react-native-community/async-storage';
 
 export default class OpenCashier extends Component {
@@ -24,21 +25,56 @@ export default class OpenCashier extends Component {
     super(props);
     this.state = {
       number: '',
+      invalid: false,
+      nama_lengkap: '',
     };
   }
-
+  changeInvalid = bool => {
+    this.setState({invalid: bool});
+  };
+  onChangeNumber = value => {
+    this.setState({number: value});
+  };
   authCashier = async () => {
-    const responsible_id = await AsyncStorage.getItem('id');
-    const open_cash = this.state.number;
-    await OpenCashierService(responsible_id, open_cash).then(async result => {
-      if (result.data.error) {
-        console.log('Data tidak masuk');
-      } else {
-        this.props.navigation.navigate('Home');
-      }
+    let id_responsible = '';
+    await AsyncStorage.getItem('id_responsible').then(res => {
+      id_responsible = res;
+    });
+    let id = '';
+    await AsyncStorage.getItem('id').then(res => {
+      id = res;
+    });
+    console.log(id_responsible);
+    console.log(id);
+    // let open_cash = this.state.number;
+    // console.log(open_cash);
+    await OpenCashierService(id_responsible, this.state.number, id).then(
+      async result => {
+        console.log(result);
+        if (result.data.error) {
+          this.changeInvalid(true);
+        } else {
+          this.props.navigation.navigate('Home');
+        }
+      },
+    );
+  };
+  componentDidMount = async () => {
+    await AsyncStorage.getItem('nama_lengkap').then(res => {
+      this.setState({nama_lengkap: res});
     });
   };
   render() {
+    let nama_lengkap = this.state.nama_lengkap;
+    let invalid;
+    if (this.state.invalid) {
+      invalid = (
+        <Text style={{color: 'red', textAlign: 'center', fontSize: 15}}>
+          Maaf username / password anda salah
+        </Text>
+      );
+    }
+
     var date = IndonesiaDate(new Date());
     return (
       <>
@@ -63,7 +99,7 @@ export default class OpenCashier extends Component {
                   textAlign: 'right',
                 }}>
                 Selamat malam{'\n'}
-                <Text style={{color: 'white'}}>Nama Kasir</Text>
+                <Text style={{color: 'white'}}>{nama_lengkap}</Text>
                 {'\n'}Selamat Bekerja
               </Text>
             </View>
@@ -90,11 +126,13 @@ export default class OpenCashier extends Component {
                 <TextInput
                   style={styles.Input}
                   value={this.state.number}
-                  onChange={number => this.setState({number: number})}
+                  keyboardType={'numeric'}
+                  onChangeText={number => this.onChangeNumber(number)}
                 />
               </View>
             </View>
-            <TouchableOpacity onPress={() => authCashier()}>
+            {invalid}
+            <TouchableOpacity onPress={() => this.authCashier()}>
               <View style={styles.btnWrap}>
                 <Text style={{color: '#fB5516'}}>OPEN CASHIER</Text>
               </View>

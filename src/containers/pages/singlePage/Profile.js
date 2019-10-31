@@ -61,11 +61,32 @@ export default class Profile extends Component {
               </View>
             </View>
             <View style={styles.accountMenu}>
-              <AccoutMenu image={fund} title={'Cash Register'} />
-              <AccoutMenu image={budget} title={'Omset Hari Ini'} />
-              <AccoutMenu image={money} title={'Setoran Hari Ini'} />
-              <AccoutMenu image={cashier} title={'Transaksi Hari Ini'} />
-              <AccoutMenu image={calendar} title={'History Transaksi'} />
+              <TouchableOpacity
+                onPress={() => this.props.navigation.navigate('CashRegister')}>
+                <AccoutMenu image={fund} title={'Cash Register'} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => this.props.navigation.navigate('OmsetHariIni')}>
+                <AccoutMenu image={budget} title={'Omset Hari Ini'} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() =>
+                  this.props.navigation.navigate('SetoranHariIni')
+                }>
+                <AccoutMenu image={money} title={'Setoran Hari Ini'} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() =>
+                  this.props.navigation.navigate('TransaksiHariIni')
+                }>
+                <AccoutMenu image={cashier} title={'Transaksi Hari Ini'} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() =>
+                  this.props.navigation.navigate('HistoryTransaksi')
+                }>
+                <AccoutMenu image={calendar} title={'History Transaksi'} />
+              </TouchableOpacity>
             </View>
           </View>
         </ScrollView>

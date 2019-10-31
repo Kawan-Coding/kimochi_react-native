@@ -13,32 +13,61 @@ export default class CustomerRegister extends Component {
     super(props);
     this.state = {
       username: '',
-      password: null,
+      password: '',
       email: '',
       nama_lengkap: '',
       no_telepon: '',
+      email: '',
+      tanggal_lahir: null,
       kendaraan: '',
       plat_nomor: '',
       member: '',
-      gender: '',
+      gender: 'laki-laki',
       date: new Date(),
     };
   }
-
+  handleNamaLengkap = val => {
+    this.setState({nama_lengkap: val});
+  };
+  handleNoTelepon = val => {
+    this.setState({no_telepon: val});
+  };
+  handleEmail = val => {
+    this.setState({email: val});
+  };
+  handleTanggalLahir = val => {
+    console.log(val);
+    this.setState({tanggal_lahir: val});
+  };
+  handleKendaraan = val => {
+    this.setState({kendaraan: val});
+  };
+  handlePlatNomor = val => {
+    this.setState({plat_nomor: val});
+  };
+  handleMember = val => {
+    this.setState({member: val});
+  };
+  handleGender = val => {
+    console.log(val);
+    this.setState({gender: val});
+  };
   register = async () => {
-    console.log('masuk');
     let data = this.state;
+    console.log(data);
     await AddCustomer(
       data.username,
       data.password,
       data.nama_lengkap,
       data.no_telepon,
+      data.email,
+      data.tanggal_lahir,
       data.kendaraan,
       data.plat_nomor,
       data.member,
+      data.gender,
     ).then(result => {
       if (result.data.error) {
-        console.log(result.data.message);
       } else {
         this.props.navigation.navigate('Home');
       }
@@ -56,9 +85,7 @@ export default class CustomerRegister extends Component {
           <TextInput
             style={styles.input}
             value={this.state.nama_lengkap}
-            onChange={nama_lengkap =>
-              this.setState({nama_lengkap: nama_lengkap})
-            }
+            onChangeText={nama_lengkap => this.handleNamaLengkap(nama_lengkap)}
           />
           <Text style={{marginTop: 10}}>
             No HP
@@ -66,8 +93,9 @@ export default class CustomerRegister extends Component {
           </Text>
           <TextInput
             style={styles.input}
+            keyboardType={'numeric'}
             value={this.state.no_telepon}
-            onChange={no_telepon => this.setState({no_telepon: no_telepon})}
+            onChangeText={no_telepon => this.handleNoTelepon(no_telepon)}
           />
           <Text style={{marginTop: 10}}>
             Email
@@ -76,7 +104,7 @@ export default class CustomerRegister extends Component {
           <TextInput
             style={styles.input}
             value={this.state.email}
-            onChange={email => this.setState({email: email})}
+            onChangeText={email => this.handleEmail(email)}
           />
           <Text style={{marginTop: 10}}>
             Gender
@@ -86,10 +114,10 @@ export default class CustomerRegister extends Component {
             style={styles.input}
             selectedValue={this.state.gender}
             onValueChange={(itemValue, itemIndex) =>
-              this.setState({gender: itemValue})
+              this.handleGender(itemValue)
             }>
-            <Picker.Item label="Laki-laki" value="L" />
-            <Picker.Item label="Perempuan" value="P" />
+            <Picker.Item label="Laki-laki" value="laki-laki" />
+            <Picker.Item label="Perempuan" value="perempuan" />
           </Picker>
           <Text style={{marginTop: 10}}>
             Tanggal Lahir
@@ -118,20 +146,20 @@ export default class CustomerRegister extends Component {
               },
             }}
             onDateChange={date => {
-              this.setState({date: date});
+              this.handleTanggalLahir(date);
             }}
           />
           <Text style={{marginTop: 10}}>Merk Kendaraan</Text>
           <TextInput
             style={styles.input}
             value={this.state.kendaraan}
-            onChange={kendaraan => this.setState({kendaraan: kendaraan})}
+            onChangeText={kendaraan => this.handleKendaraan(kendaraan)}
           />
           <Text style={{marginTop: 10}}>Plat Nomer</Text>
           <TextInput
             style={styles.input}
             value={this.state.plat_nomor}
-            onChange={plat_nomor => this.setState({plat_nomor: plat_nomor})}
+            onChangeText={plat_nomor => this.handlePlatNomor(plat_nomor)}
           />
           <Text style={{marginTop: 10}}>
             Status Member
@@ -140,7 +168,7 @@ export default class CustomerRegister extends Component {
           <TextInput
             style={styles.input}
             value={this.state.member}
-            onChange={member => this.setState({member: member})}
+            onChangeText={member => this.handleMember(member)}
           />
           <TouchableOpacity onPress={() => this.register()}>
             <View style={{alignItems: 'center', marginTop: 10}}>
