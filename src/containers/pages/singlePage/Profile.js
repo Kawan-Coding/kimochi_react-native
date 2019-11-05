@@ -37,7 +37,7 @@ export default class Profile extends Component {
   }
   render() {
     const data = this.state.dataSource;
-    console.log(data);
+
     return (
       <>
         <HeaderApp />
@@ -47,7 +47,7 @@ export default class Profile extends Component {
             <View style={styles.accountCard}>
               <View style={styles.cardLeft}>
                 <Text style={{fontWeight: 'bold'}}>{data.nama_lengkap}</Text>
-                <Text>kawancoding@gmail.com</Text>
+                <Text>{data.email}</Text>
                 <Text>{data.no_telepon}</Text>
               </View>
               <View style={styles.cardRight}>

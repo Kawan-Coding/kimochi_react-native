@@ -56,9 +56,9 @@ const OrderCard = props => {
               style={[styles.status, {backgroundColor: transaction_status}]}>
               {props.transaction_status}
             </Text>
-            <Text style={[styles.status, {backgroundColor: process_status}]}>
+            {/* <Text style={[styles.status, {backgroundColor: process_status}]}>
               {props.process_status}
-            </Text>
+            </Text> */}
           </View>
         </View>
       </TouchableOpacity>

@@ -20,12 +20,15 @@ import AsyncStorage from '@react-native-community/async-storage';
 import KimochiModal from '../../../component/KimochiModal';
 
 import {CloseCashierService} from '../../../config/service/Pegawai';
+import {GetItem} from '../../../config/service/Storage';
 export default class CloseCashier extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isModalVisible: false,
       number: '',
+      nama_lengkap: '',
+      zona: '',
     };
   }
   changeModalVisibility = bool => {
@@ -48,18 +51,33 @@ export default class CloseCashier extends Component {
       }
     });
   };
-  render() {
+  getNamaLengkap = async () => {
+    let nama_lengkap;
+    await GetItem('nama_lengkap').then(res => {
+      nama_lengkap = res;
+      this.setState({nama_lengkap: nama_lengkap});
+    });
+  };
+  getZone = () => {
     var date = IndonesiaDate(new Date());
-    let zona = '';
+
     if (Date.jam >= 0 && date.jam < 12) {
-      zona = 'pagi';
+      this.setState({zona: 'pagi'});
     }
     if (Date.jam >= 12 && date.jam < 18) {
-      zona = 'siang';
+      this.setState({zona: 'siang'});
     }
     if (Date.jam >= 18 && date.jam <= 24) {
-      zona = 'malam';
+      this.setState({zona: 'malam'});
     }
+  };
+  componentDidMount = () => {
+    this.getNamaLengkap();
+    this.getZone();
+  };
+  render() {
+    var date = IndonesiaDate(new Date());
+    console.log(this.state.zona);
     return (
       <>
         <ImageBackground
@@ -82,8 +100,8 @@ export default class CloseCashier extends Component {
                   color: 'grey',
                   textAlign: 'right',
                 }}>
-                Selamat {zona + '\n'}
-                <Text style={{color: 'white'}}>Nama Kasir</Text>
+                Selamat {this.state.zona + '\n'}
+                <Text style={{color: 'white'}}>{this.state.nama_lengkap}</Text>
                 {'\n'}Selamat Bekerja
               </Text>
             </View>

@@ -1,8 +1,17 @@
-import {RequestGet} from './Template';
+import {RequestPost, RequestGet} from './Template';
 
-const GetAllBarang = async () => {
-  const url = 'api/api_get/get_transaksi';
-  return await RequestGet(url);
+const GetAllOrder = async cabang_id => {
+  const url = 'api/api_get/get_transaksi_order';
+  let data = new FormData();
+  data.append('cabang_id', cabang_id);
+
+  return await RequestPost(url, data);
+};
+const GetAllBooking = async cabang_id => {
+  const url = 'api/api_get/get_transaksi_booking';
+  let data = new FormData();
+  data.append('cabang_id', cabang_id);
+  return await RequestPost(url, data);
 };
 
-export {GetAllBarang};
+export {GetAllOrder, GetAllBooking};

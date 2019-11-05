@@ -19,6 +19,7 @@ import HistoryTransaksi from './singlePage/HistoryTransaksi';
 import CouponSheet from './singlePage/CouponSheet';
 import DiscountSheet from './singlePage/DiscountSheet';
 import PaymentSheet from './singlePage/PaymentSheet';
+import ScanBooking from './singlePage/ScanBooking';
 
 export {
   Home,
@@ -42,4 +43,5 @@ export {
   CouponSheet,
   DiscountSheet,
   PaymentSheet,
+  ScanBooking,
 };

@@ -20,7 +20,7 @@ const GetItem = async key => {
       );
     }
   });
-  console.log(value);
+
   return value;
 };
 

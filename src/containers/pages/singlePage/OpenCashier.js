@@ -18,7 +18,7 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 
 import {OpenCashierService} from '../../../config/service/Pegawai';
 import {SetItem, GetItem} from '../../../config/service/Storage';
-import AsyncStorage from '@react-native-community/async-storage';
+// import AsyncStorage from '@react-native-community/async-storage';
 
 export default class OpenCashier extends Component {
   constructor(props) {
@@ -37,11 +37,11 @@ export default class OpenCashier extends Component {
   };
   authCashier = async () => {
     let id_responsible = '';
-    await AsyncStorage.getItem('id_responsible').then(res => {
+    await GetItem('id_responsible').then(res => {
       id_responsible = res;
     });
     let id = '';
-    await AsyncStorage.getItem('id').then(res => {
+    await GetItem('id').then(res => {
       id = res;
     });
     console.log(id_responsible);

@@ -36,8 +36,7 @@ export default class CustomerRegister extends Component {
     this.setState({email: val});
   };
   handleTanggalLahir = val => {
-    console.log(val);
-    this.setState({tanggal_lahir: val});
+    this.setState({tanggal_lahir: val.format()});
   };
   handleKendaraan = val => {
     this.setState({kendaraan: val});
@@ -67,6 +66,7 @@ export default class CustomerRegister extends Component {
       data.member,
       data.gender,
     ).then(result => {
+      console.log(result);
       if (result.data.error) {
       } else {
         this.props.navigation.navigate('Home');

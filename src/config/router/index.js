@@ -24,6 +24,7 @@ import {
   CouponSheet,
   DiscountSheet,
   PaymentSheet,
+  ScanBooking,
 } from '../../containers/pages';
 
 const HomeStack = createStackNavigator(
@@ -40,6 +41,7 @@ const OrderStack = createStackNavigator(
   {
     Order,
     StatusOrder,
+    ScanBooking,
   },
   {
     headerMode: 'none',

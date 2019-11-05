@@ -12,7 +12,6 @@ const RequestPost = async (url, data) => {
     },
   })
     .then(res => {
-      console.log(res);
       return res;
     })
     .catch(error => {
