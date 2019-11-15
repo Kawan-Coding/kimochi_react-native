@@ -1,5 +1,6 @@
 import axios from 'axios';
-const BaseUrl = 'http://kawankoding.kampungbudaya.com/';
+const BaseUrl = 'https://kawankoding.kampungbudaya.com/';
+const BaseUrlPhoto = 'https://kawankoding.kampungbudaya.com/uploads/';
 
 const RequestPost = async (url, data) => {
   return await axios({
@@ -30,7 +31,22 @@ const RequestGet = async url => {
     },
   })
     .then(res => {
-      console.log(res);
+      return res;
+    })
+    .catch(error => {
+      console.log(error);
+    });
+};
+const RequestPostOrder = async (url, data) => {
+  return await axios({
+    url: BaseUrl + url,
+    method: 'POST',
+    data: data,
+    headers: {
+      Accept: 'application/json',
+    },
+  })
+    .then(res => {
       return res;
     })
     .catch(error => {
@@ -38,4 +54,4 @@ const RequestGet = async url => {
     });
 };
 
-export {RequestPost, RequestGet};
+export {RequestPost, RequestGet, RequestPostOrder, BaseUrl, BaseUrlPhoto};

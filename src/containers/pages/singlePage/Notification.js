@@ -10,8 +10,38 @@ import {
 
 import NotifCard from '../../../component/NotifCard';
 import clearNotif from '../../../assets/img/clearNotif.png';
+import {GetAllNotif} from '../../../config/service/Notification';
 export default class Notification extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      data: [],
+    };
+  }
+
+  componentDidMount = async () => {
+    await GetAllNotif().then(res => {
+      this.setState({data: res});
+    });
+  };
   render() {
+    let notifCard;
+    if (this.state.data.length != 0) {
+      let data = this.state.data.data.data;
+      notifCard = data.map(res => {
+        return (
+          <>
+            <NotifCard
+              title={res.judul}
+              content={res.detail}
+              create_at={res.create_at}
+              key={res.id}
+              id={res.id}
+            />
+          </>
+        );
+      });
+    }
     return (
       <>
         <HeaderApp />
@@ -23,12 +53,13 @@ export default class Notification extends Component {
             </TouchableOpacity>
           </View>
           <View style={styles.notifList}>
+            {notifCard}
+            {/* <NotifCard />
             <NotifCard />
             <NotifCard />
             <NotifCard />
             <NotifCard />
-            <NotifCard />
-            <NotifCard />
+            <NotifCard /> */}
             {/* <FlatList /> */}
           </View>
         </ScrollView>

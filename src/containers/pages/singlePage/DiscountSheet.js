@@ -2,16 +2,39 @@ import React, {Component} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import SheetTitle from '../../../component/SheetTitle';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
+import {GetDiscount} from '../../../config/service/Transaction';
 
 export default class DiscountSheet extends Component {
   constructor(props) {
     super(props);
     this.state = {
       name: '',
+      data: [],
     };
   }
+  componentDidMount = async () => {
+    await GetDiscount().then(res => {
+      console.log(res);
+      // this.setState({data: res});
+    });
+  };
   render() {
-    const fun = this.props.navigation.state.params.function;
+    const fun = this.props.navigation.state.params.fun;
+    let discountCard;
+    if (this.state.data.length != 0) {
+      let data = this.state.data.data.data;
+      discountCard = data.map(res => {
+        return (
+          <DiscountCard
+            title={res.nama}
+            content={res.detail}
+            amount={'Rp.' + res.harga}
+            fun={fun}
+            price={res.harga}
+          />
+        );
+      });
+    }
     return (
       <>
         <View
@@ -23,47 +46,49 @@ export default class DiscountSheet extends Component {
             close={this.props.navigation.pop}
           />
           <ScrollView style={{flex: 1, backgroundColor: 'white', padding: 20}}>
+            {discountCard}
+
             <DiscountCard
               title={'Voucher Diskon Agustus'}
               content={'Syarat menunjukkan KTP Kemudian KTP di Foto'}
               amount={'Rp.5000'}
-              function={fun}
+              fun={fun}
+              price={5000}
             />
             <DiscountCard
               title={'Voucher Diskon Agustus'}
               content={'Syarat menunjukkan KTP Kemudian KTP di Foto'}
               amount={'Rp.5000'}
-              function={fun}
+              fun={fun}
+              price={5000}
             />
             <DiscountCard
               title={'Voucher Diskon Agustus'}
               content={'Syarat menunjukkan KTP Kemudian KTP di Foto'}
               amount={'Rp.5000'}
-              function={fun}
+              fun={fun}
+              price={5000}
             />
             <DiscountCard
               title={'Voucher Diskon Agustus'}
               content={'Syarat menunjukkan KTP Kemudian KTP di Foto'}
               amount={'Rp.5000'}
-              function={fun}
+              fun={fun}
+              price={5000}
             />
             <DiscountCard
               title={'Voucher Diskon Agustus'}
               content={'Syarat menunjukkan KTP Kemudian KTP di Foto'}
               amount={'Rp.5000'}
-              function={fun}
+              fun={fun}
+              price={5000}
             />
             <DiscountCard
               title={'Voucher Diskon Agustus'}
               content={'Syarat menunjukkan KTP Kemudian KTP di Foto'}
               amount={'Rp.5000'}
-              function={fun}
-            />
-            <DiscountCard
-              title={'Voucher Diskon Agustus'}
-              content={'Syarat menunjukkan KTP Kemudian KTP di Foto'}
-              amount={'Rp.5000'}
-              function={fun}
+              fun={fun}
+              price={5000}
             />
           </ScrollView>
         </View>
@@ -94,7 +119,7 @@ const DiscountCard = props => {
             marginTop: 10,
           }}>
           <TouchableOpacity
-            onPress={() => props.function(true, 5000, 'voucher bulan agustus')}>
+            onPress={() => props.fun(true, props.price, props.title)}>
             <Text
               style={{textAlign: 'center', color: 'white', fontWeight: 'bold'}}>
               Pilih

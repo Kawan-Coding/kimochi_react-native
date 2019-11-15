@@ -34,8 +34,11 @@ export default class CashRegister extends Component {
     let data = this.state;
 
     // let date = IndonesiaDate(new Date(data.create_at));
+    console.log(data.create_at);
     let date = new Date(data.create_at);
+    console.log(date);
     date = IndonesiaDate(new Date(date));
+    console.log(date);
 
     return (
       <>

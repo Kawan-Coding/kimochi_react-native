@@ -6,25 +6,49 @@ import {ScrollView} from 'react-native-gesture-handler';
 
 import Deal from '../../../assets/img/deal.jpg';
 import DetailTop from '../../../component/DetailTop';
+import {GetSingleNotif} from '../../../config/service/Notification';
 
-const NotifDetail = props => {
-  return (
-    <>
-      <DetailTop title={'New Order'} />
-      <ScrollView>
-        <View>
-          <Image source={Deal} style={{width: '100%', height: 300}} />
-          <Text style={styles.notifContent}>
-            Lorem Ipsum adalah contoh teks atau dummy dalam industri percetakan
-            dan penataan huruf atau typesetting. Lorem Ipsum telah menjadi
-            standar contoh teks sejak tahun 1500an, saat
-          </Text>
-        </View>
-      </ScrollView>
-    </>
-  );
-};
-
+export default class NotifDetail extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      data: [],
+    };
+  }
+  componentDidMount = async () => {
+    let id = await this.props.navigation.state.params.id;
+    await GetSingleNotif(id).then(res => {
+      this.setState({data: res});
+    });
+  };
+  render() {
+    let title;
+    let image;
+    let content;
+    if (this.state.data.length != 0) {
+      let data = this.state.data.data.data;
+      title = data.judul;
+      image = data.foto;
+      content = data.detail;
+    }
+    return (
+      <>
+        <DetailTop title={title} />
+        <ScrollView>
+          <View>
+            <Image
+              source={{
+                uri: 'https://kawankoding.kampungbudaya.com/uploads/' + image,
+              }}
+              style={{width: '100%', height: 300}}
+            />
+            <Text style={styles.notifContent}>{content}</Text>
+          </View>
+        </ScrollView>
+      </>
+    );
+  }
+}
 const styles = StyleSheet.create({
   notifContent: {
     marginTop: 20,
@@ -32,5 +56,3 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
-export default withNavigation(NotifDetail);

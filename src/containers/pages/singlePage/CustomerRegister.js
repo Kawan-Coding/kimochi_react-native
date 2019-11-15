@@ -1,13 +1,15 @@
 import React, {Component} from 'react';
 
-import {Text, TextInput, StyleSheet, View, Picker} from 'react-native';
+import {Text, TextInput, StyleSheet, View, Picker, Image} from 'react-native';
 import DetailTop from '../../../component/DetailTop';
+import {IndonesiaDate} from '../../../config/utilities/IndonesiaDate';
 
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 
-import DatePicker from 'react-native-datepicker';
-
+// import DatePicker from 'react-native-datepicker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import {AddCustomer} from '../../../config/service/Customer';
+import calendarColor from '../../../assets/img/calendarColor.png';
 export default class CustomerRegister extends Component {
   constructor(props) {
     super(props);
@@ -24,8 +26,32 @@ export default class CustomerRegister extends Component {
       member: '',
       gender: 'laki-laki',
       date: new Date(),
+      mode: 'date',
+      show: false,
     };
   }
+  setDate = (event, date) => {
+    date = date || this.state.date;
+
+    this.setState({
+      show: Platform.OS === 'ios' ? true : false,
+      date,
+    });
+  };
+  show = mode => {
+    this.setState({
+      show: true,
+      mode,
+    });
+  };
+
+  datepicker = () => {
+    this.show('date');
+  };
+
+  timepicker = () => {
+    this.show('time');
+  };
   handleNamaLengkap = val => {
     this.setState({nama_lengkap: val});
   };
@@ -48,32 +74,48 @@ export default class CustomerRegister extends Component {
     this.setState({member: val});
   };
   handleGender = val => {
-    console.log(val);
     this.setState({gender: val});
   };
+  formatdate = date => {
+    var d = new Date(date),
+      month = '' + (d.getMonth() + 1),
+      day = '' + d.getDate(),
+      year = d.getFullYear();
+
+    if (month.length < 2) month = '0' + month;
+    if (day.length < 2) day = '0' + day;
+
+    return [year, month, day].join('-');
+  };
   register = async () => {
-    let data = this.state;
-    console.log(data);
-    await AddCustomer(
-      data.username,
-      data.password,
-      data.nama_lengkap,
-      data.no_telepon,
-      data.email,
-      data.tanggal_lahir,
-      data.kendaraan,
-      data.plat_nomor,
-      data.member,
-      data.gender,
-    ).then(result => {
-      console.log(result);
-      if (result.data.error) {
-      } else {
-        this.props.navigation.navigate('Home');
-      }
-    });
+    let date = this.formatdate(this.state.date);
+
+    console.log(date);
+    this.props.navigation.navigate('CustomerOrder');
+    // let data = this.state;
+    // console.log(data);
+    // await AddCustomer(
+    //   data.username,
+    //   data.password,
+    //   data.nama_lengkap,
+    //   data.no_telepon,
+    //   data.email,
+    //   data.tanggal_lahir,
+    //   data.kendaraan,
+    //   data.plat_nomor,
+    //   data.member,
+    //   data.gender,
+    // ).then(result => {
+    //   console.log(result);
+    //   if (result.data.error) {
+    //   } else {
+    //     this.props.navigation.navigate('Home');
+    //   }
+    // });
   };
   render() {
+    const {show, date, mode} = this.state;
+    let tanggal = IndonesiaDate(this.state.date);
     return (
       <>
         <DetailTop title={'Pendaftaran Customer'} />
@@ -123,8 +165,27 @@ export default class CustomerRegister extends Component {
             Tanggal Lahir
             <Text style={{color: 'red'}}>*</Text>
           </Text>
-          {/* <View style={styles.input} onPress={this.datepicker}></View> */}
-          <DatePicker
+          <TouchableOpacity onPress={this.datepicker}>
+            <View
+              style={{
+                flexDirection: 'row',
+                marginHorizontal: 10,
+                paddingVertical: 10,
+              }}>
+              <Image
+                source={calendarColor}
+                style={{
+                  width: 20,
+                  height: 20,
+                  marginRight: 10,
+                }}
+              />
+              <Text>
+                {tanggal.tanggal + ' ' + tanggal.bulan + ' ' + tanggal.tahun}
+              </Text>
+            </View>
+          </TouchableOpacity>
+          {/* <DatePicker
             style={{width: 200}}
             date={this.state.date}
             mode="date"
@@ -148,7 +209,7 @@ export default class CustomerRegister extends Component {
             onDateChange={date => {
               this.handleTanggalLahir(date);
             }}
-          />
+          /> */}
           <Text style={{marginTop: 10}}>Merk Kendaraan</Text>
           <TextInput
             style={styles.input}
@@ -176,6 +237,15 @@ export default class CustomerRegister extends Component {
             </View>
           </TouchableOpacity>
         </ScrollView>
+        {show && (
+          <DateTimePicker
+            value={date}
+            mode={mode}
+            is24Hour={true}
+            display="default"
+            onChange={this.setDate}
+          />
+        )}
       </>
     );
   }

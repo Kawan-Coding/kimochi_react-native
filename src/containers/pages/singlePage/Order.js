@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Text, View, StyleSheet, Image} from 'react-native';
+import {Text, View, StyleSheet, Image, ActivityIndicator} from 'react-native';
 import BottomTab from '../../../component/BottomTab';
 import HeaderApp from '../../../component/HeaderApp';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
@@ -17,6 +17,7 @@ export default class Order extends Component {
       dataOrder: [],
       dataBooking: [],
       tabOrder: true,
+      isLoading: true,
     };
   }
   getOrder = async () => {
@@ -33,7 +34,6 @@ export default class Order extends Component {
   getBooking = async () => {
     await GetItem('cabang_id').then(async result => {
       await GetAllBooking(result).then(result => {
-        console.log(result);
         if (result.data.error) {
           console.log(result.data.message);
         } else {
@@ -41,6 +41,9 @@ export default class Order extends Component {
         }
       });
     });
+  };
+  changeIsLoading = bool => {
+    this.setState({isLoading: bool});
   };
   changeTabOrder = bool => {
     this.setState({tabOrder: bool});
@@ -66,39 +69,39 @@ export default class Order extends Component {
       this.state.dataBooking.length != 0
     ) {
       if (this.state.tabOrder) {
-        orderCard = this.state.dataOrder.map(item => {
-          console.log(item);
+        orderCard = this.state.dataOrder.map(res => {
           return (
             <OrderCard
-              transaction_status={'unpaid'}
-              create_at={new Date()}
-              tr_id={'TO_123456'}
-              data_customer={'KAwan Koding'}
-              customer_id={'CST_123456'}
+              transaction_status={res.status}
+              process_status={res.status_produksi}
+              create_at={res.jam_order}
+              tr_id={res.tr_id}
+              data_customer={res.data_customer}
+              customer_id={res.customer_id}
               telephone={'0909898'}
               link={'StatusOrder'}
-              key={item.taking_order_id}
+              key={res.taking_order_id}
               // onPress={this.modalTrigger()}
             />
           );
         });
       } else {
-        // orderCard = this.state.dataBooking.map(item => {
-        orderCard = (
-          // return (
-          <OrderCard
-            transaction_status={'unpaid'}
-            create_at={new Date()}
-            tr_id={'TO_123456'}
-            data_customer={'KAwan Koding'}
-            customer_id={'CST_123456'}
-            telephone={'0909898'}
-            link={'ScanBooking'}
-            // onPress={this.modalTrigger()}
-          />
-        );
-        // );
-        // });
+        orderCard = this.state.dataBooking.map(res => {
+          return (
+            <OrderCard
+              transaction_status={res.status}
+              process_status={res.status_produksi}
+              create_at={res.jam_order}
+              tr_id={res.tr_id}
+              data_customer={res.data_customer}
+              customer_id={res.customer_id}
+              telephone={'0909898'}
+              link={'ScanBooking'}
+              key={res.taking_order_id}
+              // onPress={this.modalTrigger()}
+            />
+          );
+        });
       }
     }
 

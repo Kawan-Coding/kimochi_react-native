@@ -20,6 +20,11 @@ import CouponSheet from './singlePage/CouponSheet';
 import DiscountSheet from './singlePage/DiscountSheet';
 import PaymentSheet from './singlePage/PaymentSheet';
 import ScanBooking from './singlePage/ScanBooking';
+import CustomerOrder from './singlePage/CustomerOrder';
+import CuciHelm from './singlePage/CuciHelm';
+import Aksesoris from './singlePage/Aksesoris';
+import CuciHelmKondisi from './singlePage/CuciHelmKondisi';
+import ShoppingCart from './singlePage/ShoppingCart';
 
 export {
   Home,
@@ -44,4 +49,9 @@ export {
   DiscountSheet,
   PaymentSheet,
   ScanBooking,
+  CustomerOrder,
+  CuciHelm,
+  Aksesoris,
+  CuciHelmKondisi,
+  ShoppingCart,
 };

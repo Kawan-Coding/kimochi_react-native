@@ -1,4 +1,4 @@
-import {RequestPost} from './Template';
+import {RequestPost, RequestGet} from './Template';
 
 const AddCustomer = async (
   username,
@@ -27,4 +27,14 @@ const AddCustomer = async (
   return await RequestPost(url, data);
 };
 
-export {AddCustomer};
+const GetDataBarang = async () => {
+  const url = 'api/api_get/get_data_barang';
+  return await RequestGet(url);
+};
+const GetCustomer = async id => {
+  const url = 'sapi/customer/read';
+  let data = new FormData();
+  data.append('id', id);
+  return await RequestPost(url, data);
+};
+export {AddCustomer, GetDataBarang, GetCustomer};

@@ -28,11 +28,11 @@ export default class CashierPayment extends Component {
       totalAkhir: 18000,
       discountVisible: false,
       discountChoosen: false,
-      discountValue: '',
+      discountValue: 0,
       discountCardText: '',
       couponVisible: false,
       couponChoosen: false,
-      couponValue: '',
+      couponValue: 0,
       couponCardText: '',
       paymentVisible: false,
       paymentChoosen: false,
@@ -67,10 +67,14 @@ export default class CashierPayment extends Component {
   changeCouponVisibility = visible => {
     this.setState({couponVisible: visible});
   };
-  chooseCoupon = visible => {
+  chooseCoupon = (visible, couponValue, couponCardText) => {
     console.log('choose coupon');
 
-    this.setState({couponChoosen: visible});
+    this.setState({
+      couponChoosen: visible,
+      couponValue: couponValue,
+      couponCardText: couponCardText,
+    });
     this.props.navigation.pop();
   };
   changePaymentVisibility = visible => {
@@ -127,7 +131,7 @@ export default class CashierPayment extends Component {
             <TouchableOpacity
               onPress={() =>
                 this.props.navigation.navigate('DiscountSheet', {
-                  function: this.chooseDiscount,
+                  fun: this.chooseDiscount,
                 })
               }>
               <PaymentCard image={Discount} type={discountValue} />

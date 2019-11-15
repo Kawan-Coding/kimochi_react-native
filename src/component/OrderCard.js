@@ -6,7 +6,10 @@ import {withNavigation} from 'react-navigation';
 import {IndonesiaDate} from '../config/utilities/IndonesiaDate';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 const OrderCard = props => {
-  let date = IndonesiaDate(props.create_at);
+  let date = new Date(props.create_at);
+
+  date = IndonesiaDate(new Date(date));
+  // console.log(date);
   let transaction_status = '';
   let process_status = '';
   if (props.transaction_status == 'unpaid') {
@@ -42,7 +45,7 @@ const OrderCard = props => {
               <DetailOrderCard title={'TR_ID'} content={props.tr_id} />
               <DetailOrderCard
                 title={'Customer'}
-                content={props.data_customer}
+                content={props.data_customer.nama_lengkap}
               />
               <DetailOrderCard
                 title={'Customer ID'}
@@ -56,9 +59,9 @@ const OrderCard = props => {
               style={[styles.status, {backgroundColor: transaction_status}]}>
               {props.transaction_status}
             </Text>
-            {/* <Text style={[styles.status, {backgroundColor: process_status}]}>
+            <Text style={[styles.status, {backgroundColor: process_status}]}>
               {props.process_status}
-            </Text> */}
+            </Text>
           </View>
         </View>
       </TouchableOpacity>

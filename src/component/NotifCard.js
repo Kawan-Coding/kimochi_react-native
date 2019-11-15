@@ -14,7 +14,9 @@ const NotifCard = props => {
       <View style={styles.container}>
         <Image source={IconCard} style={styles.iconCard} />
         <TouchableOpacity
-          onPress={() => props.navigation.navigate('NotifDetail')}>
+          onPress={() =>
+            props.navigation.navigate('NotifDetail', {id: props.id})
+          }>
           <View style={styles.cardWrap}>
             <View style={styles.cardTop}>
               <View
@@ -23,7 +25,7 @@ const NotifCard = props => {
                   alignItems: 'flex-start',
                   justifyContent: 'flex-start',
                 }}>
-                <Text style={{fontWeight: 'bold'}}>New Order</Text>
+                <Text style={{fontWeight: 'bold'}}>{props.title}</Text>
               </View>
               <View
                 style={{
@@ -37,10 +39,7 @@ const NotifCard = props => {
               </View>
             </View>
             <View style={styles.cardContent}>
-              <Text>
-                Congrat's anda mendapatkan tambahan (1) satu customer baru.
-                Silahkan lihat order di fitur order
-              </Text>
+              <Text>{props.content}</Text>
             </View>
           </View>
         </TouchableOpacity>
@@ -66,6 +65,7 @@ const styles = StyleSheet.create({
   },
   cardWrap: {
     paddingHorizontal: 5,
+    width: Dimensions.get('window').width - 60,
   },
   cardTop: {
     flexDirection: 'row',

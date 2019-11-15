@@ -25,6 +25,11 @@ import {
   DiscountSheet,
   PaymentSheet,
   ScanBooking,
+  CustomerOrder,
+  CuciHelm,
+  Aksesoris,
+  CuciHelmKondisi,
+  ShoppingCart,
 } from '../../containers/pages';
 
 const HomeStack = createStackNavigator(
@@ -32,6 +37,11 @@ const HomeStack = createStackNavigator(
     Home,
     CloseCashier,
     CustomerRegister,
+    CustomerOrder,
+    CuciHelm,
+    Aksesoris,
+    CuciHelmKondisi,
+    ShoppingCart,
   },
   {
     headerMode: 'none',
