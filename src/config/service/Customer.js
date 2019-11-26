@@ -27,9 +27,17 @@ const AddCustomer = async (
   return await RequestPost(url, data);
 };
 
+const GetDataBarangTrId = async tr_id => {
+  const url = 'api/api_get/get_data_barang';
+  let data = new FormData();
+  data.append('tr_id', tr_id);
+  return await RequestPost(url, data);
+};
 const GetDataBarang = async () => {
   const url = 'api/api_get/get_data_barang';
-  return await RequestGet(url);
+  let data = new FormData();
+  data.append('hiyah', 'hiyah');
+  return await RequestPost(url, data);
 };
 const GetCustomer = async id => {
   const url = 'sapi/customer/read';
@@ -37,4 +45,4 @@ const GetCustomer = async id => {
   data.append('id', id);
   return await RequestPost(url, data);
 };
-export {AddCustomer, GetDataBarang, GetCustomer};
+export {AddCustomer, GetDataBarang, GetDataBarangTrId, GetCustomer};

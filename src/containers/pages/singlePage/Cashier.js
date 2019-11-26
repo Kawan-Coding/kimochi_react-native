@@ -6,8 +6,56 @@ import {ScrollView} from 'react-native-gesture-handler';
 import Search from '../../../assets/img/search.png';
 import OrderCard from '../../../component/OrderCard';
 
+import {GetAllOrder, GetAllBooking} from '../../../config/service/Barang';
+import {GetItem} from '../../../config/service/Storage';
+
 export default class Cashier extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      data: [],
+    };
+  }
+
+  getOrder = async () => {
+    await GetItem('cabang_id').then(async result => {
+      await GetAllOrder(result).then(result => {
+        if (result.data.error) {
+          console.log(result.data.message);
+        } else {
+          console.log(result);
+          this.setState({data: result.data.data});
+        }
+      });
+    });
+  };
+  componentDidMount = async () => {
+    await this.getOrder();
+  };
   render() {
+    let orderCard;
+    if (this.state.data.length != 0) {
+      orderCard = this.state.data.map(res => {
+        if (res.status == 'unpaid') {
+          return (
+            <OrderCard
+              transaction_status={res.status}
+              process_status={res.status_produksi}
+              create_at={res.jam_order}
+              tr_id={res.tr_id}
+              data_customer={res.data_customer}
+              dataSend={[]}
+              dataView={[]}
+              customer_id={res.customer_id}
+              telephone={res.data_customer.no_telepon}
+              link={this.props.navigation.navigate}
+              page={'ShoppingCart'}
+              key={res.taking_order_id}
+            />
+          );
+        }
+      });
+    }
     return (
       <>
         <HeaderApp />
@@ -19,18 +67,7 @@ export default class Cashier extends Component {
             <Image source={Search} style={{width: 20, height: 20}} />
           </View>
         </View>
-        <ScrollView style={{paddingHorizontal: 20}}>
-          <OrderCard
-            transaction_status={'paid'}
-            process_status={'finish'}
-            create_at={new Date()}
-            tr_id={'TO_123456'}
-            data_customer={'KAwan Koding'}
-            customer_id={'CST_123456'}
-            telephone={'0909898'}
-            link={'CashierPayment'}
-          />
-        </ScrollView>
+        <ScrollView style={{paddingHorizontal: 20}}>{orderCard}</ScrollView>
 
         <BottomTab />
       </>

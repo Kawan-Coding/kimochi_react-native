@@ -8,7 +8,7 @@ const DetailTop = props => {
     <>
       <View style={styles.detailTop}>
         <View style={styles.topLeft}>
-          <Text style={{fontWeight: 'bold', color: '#fB5516', fontSize: 22}}>
+          <Text style={{fontWeight: 'bold', color: '#fB5516', fontSize: 21}}>
             {props.title}
           </Text>
         </View>

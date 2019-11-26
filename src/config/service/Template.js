@@ -43,7 +43,8 @@ const RequestPostOrder = async (url, data) => {
     method: 'POST',
     data: data,
     headers: {
-      Accept: 'application/json',
+      // Accept: 'application/json',
+      'Content-Type': 'application/json',
     },
   })
     .then(res => {

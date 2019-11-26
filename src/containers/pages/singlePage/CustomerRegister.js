@@ -91,27 +91,30 @@ export default class CustomerRegister extends Component {
     let date = this.formatdate(this.state.date);
 
     console.log(date);
-    this.props.navigation.navigate('CustomerOrder');
-    // let data = this.state;
-    // console.log(data);
-    // await AddCustomer(
-    //   data.username,
-    //   data.password,
-    //   data.nama_lengkap,
-    //   data.no_telepon,
-    //   data.email,
-    //   data.tanggal_lahir,
-    //   data.kendaraan,
-    //   data.plat_nomor,
-    //   data.member,
-    //   data.gender,
-    // ).then(result => {
-    //   console.log(result);
-    //   if (result.data.error) {
-    //   } else {
-    //     this.props.navigation.navigate('Home');
-    //   }
-    // });
+    // this.props.navigation.navigate('CustomerOrder');
+    let data = this.state;
+    console.log(data);
+    await AddCustomer(
+      data.username,
+      data.password,
+      data.nama_lengkap,
+      data.no_telepon,
+      data.email,
+      data.tanggal_lahir,
+      data.kendaraan,
+      data.plat_nomor,
+      data.member,
+      data.gender,
+    ).then(result => {
+      console.log(result);
+      if (result.data.error) {
+        console.log(result.data.msg);
+      } else {
+        this.props.navigation.navigate('CustomerOrder', {
+          customer_id: result.data.data.id,
+        });
+      }
+    });
   };
   render() {
     const {show, date, mode} = this.state;

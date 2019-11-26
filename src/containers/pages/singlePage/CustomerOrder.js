@@ -6,17 +6,22 @@ import StatusOrderCard from '../../../component/StatusOrderCard';
 
 import {TouchableOpacity, ScrollView} from 'react-native-gesture-handler';
 import shoppingCart from '../../../assets/img/shoppingCart.png';
-import {GetDataBarang} from '../../../config/service/Customer';
+import {
+  GetDataBarang,
+  GetDataBarangTrId,
+} from '../../../config/service/Customer';
 import {BaseUrlPhoto} from '../../../config/service/Template';
 
 export default class CustomerOrder extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      tr_id: this.props.navigation.state.params.tr_id,
       dataView: [],
       dataSend: [],
       tabStatus: true,
-      customer_id: '8',
+      customer_id: this.props.navigation.state.params.customer_id,
+      dataFoto: [],
     };
   }
   merge_arr = data => {
@@ -65,6 +70,13 @@ export default class CustomerOrder extends Component {
       this.addDataSend(val);
       this.updateQytDataView('aksesoris', val);
     }
+  };
+  addDataFoto = val => {
+    let dataFoto = this.state.dataFoto;
+
+    dataFoto.push(val);
+
+    this.setState({dataFoto: dataFoto});
   };
   addDataSend = val => {
     let dataSend = this.state.dataSend;
@@ -123,6 +135,7 @@ export default class CustomerOrder extends Component {
     let count = 0;
     if (this.state.dataSend.length != 0) {
       this.state.dataSend.map(res => {
+        console.log(res.qyt);
         count += res.qyt;
 
         // console.log(res.qyt);
@@ -142,11 +155,13 @@ export default class CustomerOrder extends Component {
     } else {
       let dataSend = this.state.dataSend;
       let dataView = this.state.dataView;
+      let dataFoto = this.state.dataFoto;
       dataSend = this.zeroFilter(dataSend);
       console.log(dataSend);
       this.props.navigation.navigate('ShoppingCart', {
         dataView: dataView,
         dataSend: dataSend,
+        dataFoto: dataFoto,
         customer_id: this.state.customer_id,
       });
     }
@@ -161,14 +176,43 @@ export default class CustomerOrder extends Component {
     return data;
   };
   componentDidMount = async () => {
-    await GetDataBarang().then(res => {
-      console.log(res.data);
-      if (res.data.error) {
-        console.log('API error');
-      } else {
-        this.setState({dataView: res.data.data});
-      }
-    });
+    if (this.state.tr_id === undefined) {
+      console.log('masuk undefined');
+      await GetDataBarang().then(res => {
+        if (res.data.error) {
+          console.log('API error');
+        } else {
+          this.setState({dataView: res.data.data});
+        }
+      });
+    }
+    if (this.state.tr_id != undefined) {
+      console.log('masuk sini');
+      await GetDataBarangTrId(this.state.tr_id).then(res => {
+        console.log(res);
+        if (res.data.error) {
+          console.log('API error');
+        } else {
+          let dataSend = [];
+
+          if (res.data.data.cuci_helm.length != 0) {
+            res.data.data.cuci_helm.map(result => {
+              if (result.qyt != 0) {
+                dataSend.push(result);
+              }
+            });
+          }
+          if (res.data.data.aksesoris.length != 0) {
+            res.data.data.aksesoris.map(result => {
+              if (result.qyt != 0) {
+                dataSend.push(result);
+              }
+            });
+          }
+          this.setState({dataView: res.data.data, dataSend: dataSend});
+        }
+      });
+    }
   };
   render() {
     let count;
@@ -211,7 +255,9 @@ export default class CustomerOrder extends Component {
               key={res.id}
               qyt={res.qyt}
               image={BaseUrlPhoto + res.foto}
+              wallet={res.kimochi_wallet}
               fun={this.dataSendHandlerCuci}
+              fun2={this.addDataFoto}
             />
           );
         });
@@ -228,7 +274,9 @@ export default class CustomerOrder extends Component {
               key={res.id}
               qyt={res.qyt}
               image={BaseUrlPhoto + res.foto}
+              wallet={res.kimochi_wallet}
               fun={this.dataSendHandlerAksesoris}
+              fun2={this.addDataFoto}
             />
           );
         });
@@ -345,6 +393,9 @@ const ServiceCard = props => {
             <Text style={{fontSize: 12, fontWeight: 'bold', color: '#fB5516'}}>
               RP. {props.price}
             </Text>
+            <Text style={{fontSize: 11, fontWeight: 'bold', color: 'blue'}}>
+              + {props.wallet}
+            </Text>
           </View>
           <View
             style={{flex: 1, alignItems: 'center', justifyContent: 'flex-end'}}>
@@ -355,6 +406,7 @@ const ServiceCard = props => {
                   qyt: props.qyt,
                   jenis_helm: props.title,
                   fun: props.fun,
+                  fun2: props.fun2,
                   title: props.title,
                   detail: props.detail,
                   image: props.image,

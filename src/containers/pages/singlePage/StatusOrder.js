@@ -5,38 +5,201 @@ import {View, Text, Image, StyleSheet} from 'react-native';
 import {TouchableOpacity, ScrollView} from 'react-native-gesture-handler';
 import DetailTop from '../../../component/DetailTop';
 import avatar from '../../../assets/img/man.png';
+import checked from '../../../assets/img/checked.png';
+import cancel from '../../../assets/img/cancel.png';
 import {ListBottom, ListTop} from '../../../component/Bill';
+import {GetBarangTrId} from '../../../config/service/Barang';
+import {SetFinish} from '../../../config/service/Transaction';
 
 import {IndonesiaDate} from '../../../config/utilities/IndonesiaDate';
+import KimochiModal from '../../../component/KimochiModal';
 
 let date = IndonesiaDate(new Date());
 export default class StatusOrder extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      tr_id: this.props.navigation.state.params.tr_id,
+      transaction_status: this.props.navigation.state.params.transaction_status,
+      process_status: null,
+      data: [],
+      total: null,
+      isModalVisible: false,
+    };
+  }
+  componentDidMount = async () => {
+    await GetBarangTrId(this.state.tr_id).then(res => {
+      if (res.data.error) {
+        console.log(res.data.msg);
+      } else {
+        console.log(res);
+        let price = 0;
+        res.data.data.data.map(res => {
+          price += Number(res.data_barang.harga);
+        });
+        this.setState({
+          data: res.data.data,
+          total: price,
+          process_status: res.data.data.dll.status_produksi,
+        });
+      }
+    });
+  };
+  displayModal = bool => {
+    this.setState({isModalVisible: bool});
+  };
+  saveTransaction = async () => {
+    if (this.state.process_status == 'process') {
+      await SetFinish(this.state.tr_id).then(res => {
+        console.log(res);
+        if (res.data.error) {
+          console.log(res.data.msg);
+        } else {
+          this.displayModal(true);
+        }
+      });
+    } else {
+      this.displayModal(true);
+    }
+  };
   render() {
-    return (
-      <>
-        <DetailTop title={'Status Order - Proses'} />
-        <StatusOrderCard
-          name={'Kawan Koding'}
-          number={'09812312'}
-          history={'3'}
-          member={'Member Grab'}
-        />
-        <ScrollView>
-          <View style={{paddingHorizontal: 20, marginVertical: 20, flex: 1}}>
-            <OrderList />
-          </View>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'flex-end',
-              alignItems: 'center',
-              paddingVertical: 15,
-            }}>
+    let data;
+    let orderList;
+    let kimochiModal;
+    let saveBtn;
+
+    if (this.state.data.length != 0) {
+      data = this.state.data;
+      console.log(data);
+      let kimochiModal;
+      let transaction_status = this.state.transaction_status;
+      if (
+        data.dll.status_produksi == 'process' &&
+        transaction_status == 'unpaid'
+      ) {
+        kimochiModal = (
+          <KimochiModal
+            opacity={this.state.isModalVisible}
+            hide={this.changeModalVisibility}
+            message={
+              'Proses cuci helm telah selesai, tetapi customer belum melakukan pembayaran \n\n Silahkan informasikan kepada customer untuk segera melakukan pembayaran'
+            }
+            icon={checked}
+            option={false}
+            function={this.props.navigation.pop}
+          />
+        );
+        saveBtn = (
+          <TouchableOpacity onPress={() => this.saveTransaction()}>
             <BtnConfirm title={'Selesai'} />
-          </View>
-        </ScrollView>
-      </>
-    );
+          </TouchableOpacity>
+        );
+      }
+      if (
+        data.dll.status_produksi == 'finish' &&
+        transaction_status == 'unpaid'
+      ) {
+        kimochiModal = (
+          <KimochiModal
+            opacity={this.state.isModalVisible}
+            hide={this.changeModalVisibility}
+            message={
+              'Customer belum melakukan pembayaran, barang tidak bisa diambil \n\n Silahkan informasikan kepada customer untuk segera melakukan pembayaran'
+            }
+            icon={cancel}
+            option={false}
+            function={this.props.navigation.pop}
+          />
+        );
+        saveBtn = (
+          <TouchableOpacity onPress={() => this.saveTransaction()}>
+            <BtnConfirm title={'Serah Terima'} />
+          </TouchableOpacity>
+        );
+      }
+      if (
+        data.dll.status_produksi == 'process' &&
+        transaction_status == 'paid'
+      ) {
+        kimochiModal = (
+          <KimochiModal
+            opacity={this.state.isModalVisible}
+            hide={this.changeModalVisibility}
+            message={
+              'Proses cuci helm telah selesai\n\nSilahkan informasikan kepada customer untuk segera melakukan pengambilan'
+            }
+            icon={checked}
+            option={false}
+            function={this.props.navigation.pop}
+          />
+        );
+        saveBtn = (
+          <TouchableOpacity onPress={() => this.saveTransaction()}>
+            <BtnConfirm title={'Selesai'} />
+          </TouchableOpacity>
+        );
+      }
+      if (
+        data.dll.status_produksi == 'finish' &&
+        transaction_status == 'paid'
+      ) {
+        kimochiModal = (
+          <KimochiModal
+            opacity={this.state.isModalVisible}
+            hide={this.changeModalVisibility}
+            message={
+              'Anda akan memberikan helm customer yang telah selesai dicuci\n\n Apakah anda yakin?'
+            }
+            icon={checked}
+            option={false}
+            function={this.props.navigation.pop}
+          />
+        );
+        saveBtn = (
+          <TouchableOpacity onPress={() => this.saveTransaction()}>
+            <BtnConfirm title={'Serah terima'} />
+          </TouchableOpacity>
+        );
+      }
+      return (
+        <>
+          <DetailTop title={'Status Order - Proses'} />
+          <StatusOrderCard
+            name={data.customer.nama_lengkap}
+            number={data.customer.no_telepon}
+            history={'3'}
+            member={data.customer.member}
+          />
+          <ScrollView>
+            <View style={{paddingHorizontal: 20, marginVertical: 20, flex: 1}}>
+              <OrderList
+                data={data}
+                status={this.state.transaction_status}
+                tr_id={this.state.tr_id}
+                wallet={data.customer.kimochi_wallet}
+                total={this.state.total}
+              />
+            </View>
+            <View
+              style={{
+                flex: 1,
+                justifyContent: 'flex-end',
+                alignItems: 'center',
+                paddingVertical: 15,
+              }}>
+              {saveBtn}
+            </View>
+          </ScrollView>
+          {kimochiModal}
+        </>
+      );
+    } else {
+      return (
+        <>
+          <DetailTop title={'Status Order - Proses'} />
+        </>
+      );
+    }
   }
 }
 
@@ -69,47 +232,60 @@ const StatusOrderCard = props => {
 };
 
 const OrderList = props => {
+  let status;
+  if (props.status == 'unpaid') {
+    status = (
+      <Text style={[styles.status, {flex: 1, backgroundColor: 'red'}]}>
+        Unpaid
+      </Text>
+    );
+  } else {
+    status = (
+      <Text style={[styles.status, {flex: 1, backgroundColor: '#43Af4A'}]}>
+        Paid
+      </Text>
+    );
+  }
+  let date = IndonesiaDate(new Date(props.date));
+  let data = props.data;
+  let listBarang;
+
+  listBarang = data.data.map(res => {
+    return (
+      <>
+        <ListBottom
+          title={res.data_barang.nama}
+          amount={res.qyt}
+          price={res.data_barang.harga}
+          key={res.id}
+        />
+      </>
+    );
+  });
+  let data_customer = data.customer;
   return (
     <>
       <View style={styles.listTop}>
         <Text style={{flex: 2, fontWeight: 'bold'}}>ORDER LIST</Text>
-        <Text style={[styles.status, {flex: 1, backgroundColor: 'red'}]}>
-          Unpaid
-        </Text>
+        {status}
       </View>
       <View
         style={[styles.cardWrap, {borderStyle: 'dotted', paddingBottom: 15}]}>
         <ListTop
           title={'' + date.tanggal + ' ' + date.bulan + ' ' + date.tahun}
-          content={'TO_123456789'}
+          content={props.tr_id}
         />
-        <ListTop title={'Luna Maya'} content={'081239123'} />
-        <ListTop title={'luna@gmail.com'} content={'GRAB'} />
-        <ListTop title={'luna@gmail.com'} content={'GRAB'} />
-        <ListTop title={'Kimochi Wallet -- Rp.3000'} />
+        <ListTop
+          title={data_customer.nama_lengkap}
+          content={data_customer.no_telepon}
+        />
+        <ListTop title={data_customer.email} content={data_customer.member} />
+
+        <ListTop title={'Kimochi Wallet -- ' + props.wallet} />
       </View>
       <View style={[styles.cardWrap, {paddingVertical: 15}]}>
-        <ListBottom
-          title={'Cuci Standar Helm Half Face A'}
-          amount={'1'}
-          price={'15.000'}
-        />
-        <ListBottom
-          title={'Cuci Standar Helm Half Face A'}
-          amount={'1'}
-          price={'15.000'}
-        />
-        <ListBottom
-          title={'Cuci Standar Helm Half Face A'}
-          amount={'2'}
-          price={'15.000'}
-        />
-        <ListBottom
-          title={'Cuci Standar Helm Half Face A'}
-          amount={'1'}
-          price={'15.000'}
-        />
-        <ListBottom title={'Sub total'} price={'15.000'} bold={true} />
+        {listBarang}
+        <ListBottom title={'Sub total'} price={props.total} bold={true} />
       </View>
     </>
   );

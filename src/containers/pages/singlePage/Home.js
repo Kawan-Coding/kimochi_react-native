@@ -23,13 +23,18 @@ import DataHome from '../../../component/DataHome';
 import KimochiModal from '../../../component/KimochiModal';
 
 import {CheckCustomerNumber} from '../../../config/service/Pegawai';
+import {GetDataWelcome} from '../../../config/service/Transaction';
+import {GetItem} from '../../../config/service/Storage';
+
 export default class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      data: [],
       isModalVisible: '',
       number: '',
       modalStatus: '',
+      customer_id: null,
     };
   }
   changeModalVisibility = bool => {
@@ -43,7 +48,10 @@ export default class Home extends Component {
         this.setState({modalStatus: 'unregistered'});
         this.displayModal();
       } else {
-        this.setState({modalStatus: 'registered'});
+        this.setState({
+          modalStatus: 'registered',
+          customer_id: result.data.data.id,
+        });
         this.displayModal();
       }
     });
@@ -54,10 +62,27 @@ export default class Home extends Component {
   };
   redirectOrder = () => {
     this.changeModalVisibility(false);
-    this.props.navigation.navigate('CustomerOrder');
+    this.props.navigation.navigate('CustomerOrder', {
+      customer_id: this.state.customer_id,
+    });
   };
   displayModal = () => {
     this.changeModalVisibility(true);
+  };
+  getTransaction = async responsible_id => {
+    await GetDataWelcome(responsible_id).then(res => {
+      if (res.data.error) {
+        console.log(res.data);
+      } else {
+        console.log(res.data.data);
+        this.setState({data: res.data.data});
+      }
+    });
+  };
+  componentDidMount = async () => {
+    await GetItem('id_responsible').then(async res => {
+      await this.getTransaction(res);
+    });
   };
   render() {
     let kimochimodal;
@@ -88,6 +113,16 @@ export default class Home extends Component {
           function={this.redirectOrder}
         />
       );
+    }
+    let data = {
+      total_customer: 0,
+      total_antrian: 0,
+      total_omset: 0,
+      cash_register: 0,
+    };
+    if (this.state.data.length != 0) {
+      data = this.state.data;
+      console.log(data);
     }
     return (
       <>
@@ -122,12 +157,28 @@ export default class Home extends Component {
             </View>
             <View style={[styles.container, {marginTop: 40}]}>
               <View style={styles.dataWrap}>
-                <DataHome />
-                <DataHome />
+                <DataHome
+                  amount={data.total_customer}
+                  title={'Total Customer'}
+                  color={'#34e1eb'}
+                />
+                <DataHome
+                  amount={data.cash_register}
+                  title={'Cash Register'}
+                  color={'yellow'}
+                />
               </View>
               <View style={styles.dataWrap}>
-                <DataHome />
-                <DataHome />
+                <DataHome
+                  amount={data.total_antrian}
+                  title={'Total Antrian'}
+                  color={'#34e1eb'}
+                />
+                <DataHome
+                  amount={data.total_omset}
+                  title={'Total Omset'}
+                  color={'yellow'}
+                />
               </View>
             </View>
           </ScrollView>

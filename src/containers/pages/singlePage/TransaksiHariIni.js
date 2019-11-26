@@ -3,55 +3,60 @@ import {View, Text, StyleSheet} from 'react-native';
 import DetailTop from '../../../component/DetailTop';
 import DataTopProfile from '../../../component/DataTopProfile';
 import {ScrollView} from 'react-native-gesture-handler';
+import {GetTransaksiHariIni} from '../../../config/service/Transaction';
+import {GetItem} from '../../../config/service/Storage';
 
 export default class TransaksiHariIni extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: {
-        tr_id: 'TR_12345',
-        name: 'Kawan Koding',
-        order: [
-          {
-            id: 1,
-            product_name: 'Cuci Standar Helm Full Face',
-            amount: '2',
-            price: 'Rp. 15.000',
-          },
-          {
-            id: 2,
-            product_name: 'Cuci Standar Helm Full Face',
-            amount: '2',
-            price: 'Rp. 15.000',
-          },
-          {
-            id: 3,
-            product_name: 'Cuci Standar Helm Full Face',
-            amount: '1',
-            price: 'Rp. 12.000',
-          },
-        ],
-        sub_total: 'RP. 55.000',
-        voucher_discount: 'RP.5000',
-        total_payment: 'RP. 50000',
-        type: 'OVO',
-      },
+      data: [],
     };
   }
+  componentDidMount = async () => {
+    await GetItem('cabang_id').then(async res => {
+      await GetTransaksiHariIni(res).then(res => {
+        if (res.data.error) {
+          console.log(res.data);
+        } else {
+          this.setState({data: res.data.data});
+        }
+      });
+    });
+  };
   render() {
+    let data;
+    let bill;
+    let head1;
+    let head2;
+    let head3;
+    if (this.state.data.length != 0) {
+      data = this.state.data;
+      bill = <TransaksiCard data={this.state.data.data_order} />;
+      head1 = (
+        <HeaderItem
+          title={'Total Transaksi'}
+          amount={data.data_order.taking_order.length.toString()}
+        />
+      );
+      head2 = <HeaderItem title={'Tunai'} amount={data.tunai} />;
+      head3 = <HeaderItem title={'Tunai'} amount={data.non_tunai} />;
+    } else {
+      bill = <Text>Belum ada transaksi hari ini</Text>;
+    }
     return (
       <>
         <DetailTop title="Transaksi Hari Ini" />
         <View style={styles.header}>
-          <HeaderItem title={'Total Transaksi'} amount={'26'} />
-          <HeaderItem title={'Tunai'} amount={'16'} />
-          <HeaderItem title={'Non Tunai'} amount={'10'} />
+          {head1}
+          {head2}
+          {head3}
         </View>
         <ScrollView style={{paddingHorizontal: 25, paddingVertical: 10}}>
           <Text style={{color: '#fB5516', fontSize: 20, fontWeight: 'bold'}}>
             Detail
           </Text>
-          <TransaksiCard data={this.state.data} />
+          {bill}
         </ScrollView>
       </>
     );

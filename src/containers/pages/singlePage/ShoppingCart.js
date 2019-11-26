@@ -8,6 +8,7 @@ import {ListBottom, ListTop} from '../../../component/Bill';
 import {IndonesiaDate} from '../../../config/utilities/IndonesiaDate';
 import {SetTakingOrder} from '../../../config/service/Transaction';
 import {GetItem} from '../../../config/service/Storage';
+import {GetBarangTrId} from '../../../config/service/Barang';
 
 export default class ShoppingCart extends Component {
   constructor(props) {
@@ -15,10 +16,11 @@ export default class ShoppingCart extends Component {
     this.state = {
       dataSend: this.props.navigation.state.params.dataSend,
       dataView: this.props.navigation.state.params.dataView,
+      dataFoto: this.props.navigation.state.params.dataFoto,
       total: 0,
       customer_id: this.props.navigation.state.params.customer_id,
       isPaymentDone: false,
-      tr_id: '',
+      tr_id: this.props.navigation.state.params.tr_id,
     };
   }
 
@@ -34,10 +36,41 @@ export default class ShoppingCart extends Component {
 
     return count;
   };
-  componentDidMount = () => {
+  addTransaction = () => {
+    this.props.navigation.navigate('CustomerOrder', {
+      tr_id: this.state.tr_id,
+      customer_id: this.state.customer_id,
+    });
+  };
+  componentDidMount = async () => {
+    if (this.state.tr_id != null) {
+      console.log('tr id ga null');
+      this.trIdExist(this.state.tr_id);
+    } else {
+      console.log('tr id null');
+      this.sumTotal();
+    }
     // console.log(this.state.dataSend);
     // console.log(this.state.dataView);
-    this.sumTotal();
+  };
+  trIdExist = async tr_id => {
+    console.log('masuk sini');
+    await GetBarangTrId(tr_id).then(res => {
+      console.log(res);
+      if (res.data.error) {
+        console.log(res.data.msg);
+      } else {
+        let price = 0;
+        res.data.data.data.map(res => {
+          price += Number(res.data_barang.harga);
+        });
+        this.setState({
+          dataView: res.data.data,
+          total: price,
+          isPaymentDone: true,
+        });
+      }
+    });
   };
   sumTotal = () => {
     let total = this.state.total;
@@ -50,24 +83,39 @@ export default class ShoppingCart extends Component {
 
     this.setState({total: total});
   };
-  confirmPayment = async () => {
-    let cabang_id;
-    let customer_id = this.state.customer_id;
-    let dataSend = this.state.dataSend;
-    dataSend = JSON.stringify(dataSend);
-    console.log(dataSend);
-    await GetItem('cabang_id').then(res => {
-      cabang_id = res;
-    });
-    await SetTakingOrder(cabang_id, customer_id, 'order', dataSend).then(
-      res => {
-        console.log(res);
-        this.setState({isPaymentDone: true});
-      },
-    );
+  confirmPayment = async val => {
+    if (val == 'SAVE') {
+      let cabang_id;
+      let customer_id = this.state.customer_id;
+      let dataSend = this.state.dataSend;
+      let dataFoto = this.state.dataFoto;
+      dataSend = JSON.stringify(dataSend);
+      // dataFoto = JSON.stringify(dataFoto);
+      console.log(dataSend);
+      console.log(dataFoto);
+      await GetItem('cabang_id').then(res => {
+        cabang_id = res;
+      });
+      await SetTakingOrder(
+        cabang_id,
+        customer_id,
+        'order',
+        dataSend,
+        dataFoto,
+      ).then(res => {
+        this.props.navigation.navigate('Cashier');
+        // let tr_id = res.data.data.tr_id;
+        // this.setState({isPaymentDone: true, tr_id: tr_id});
+        // this.trIdExist(tr_id);
+      });
+    }
+    if (val == 'BAYAR') {
+      this.props.navigation.navigate('CashierPayment', {
+        tr_id: this.state.tr_id,
+      });
+    }
   };
   render() {
-    let date = IndonesiaDate(new Date());
     let count;
     if (this.state.dataSend.length != 0) {
       let qyt = this.getCount();
@@ -94,9 +142,48 @@ export default class ShoppingCart extends Component {
       }
     }
     let menuTop;
+    let btnConfirm;
     if (this.state.isPaymentDone) {
-      menuTop = <></>;
+      btnConfirm = (
+        <TouchableOpacity onPress={() => this.confirmPayment('BAYAR')}>
+          <BtnConfirm title="BAYAR" />
+        </TouchableOpacity>
+      );
+      menuTop = (
+        <>
+          <View
+            style={{
+              flexDirection: 'row',
+
+              paddingVertical: 10,
+            }}>
+            <View
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'flex-end',
+              }}>
+              <TouchableOpacity onPress={() => this.addTransaction()}>
+                <View
+                  style={{
+                    backgroundColor: '#43Af4A',
+                    paddingVertical: 3,
+                    paddingHorizontal: 7,
+                    borderRadius: 10,
+                  }}>
+                  <Text style={{color: 'white'}}>Tambah Transaksi</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </>
+      );
     } else {
+      btnConfirm = (
+        <TouchableOpacity onPress={() => this.confirmPayment('SAVE')}>
+          <BtnConfirm title="SAVE" />
+        </TouchableOpacity>
+      );
       menuTop = (
         <View
           style={{
@@ -121,7 +208,8 @@ export default class ShoppingCart extends Component {
                 <Text style={[{fontSize: 12}, {color: 'white'}]}>Back</Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => this.changeTabStatus(false)}>
+            <TouchableOpacity
+              onPress={() => this.props.navigation.navigate('Home')}>
               <View style={[styles.orderTab, {backgroundColor: 'white'}]}>
                 <Text style={[{fontSize: 12}, {color: '#43Af4A'}]}>Cancel</Text>
               </View>
@@ -145,34 +233,97 @@ export default class ShoppingCart extends Component {
     let dataCuciHelm;
     let dataAksesoris;
 
-    dataCuciHelm = this.state.dataView.cuci_helm.map(res => {
-      if (res.qyt != 0) {
-        return (
-          <>
-            <Text style={{fontWeight: 'bold'}}>Cuci Helm</Text>
-            <ListBottom title={res.nama} amount={res.qyt} price={res.harga} />
-          </>
-        );
+    if (this.state.tr_id == null) {
+      dataCuciHelm = this.state.dataView.cuci_helm.map((res, index) => {
+        if (res.qyt != 0) {
+          return (
+            <>
+              <Text style={{fontWeight: 'bold'}}>Cuci Helm</Text>
+              <ListBottom
+                title={res.nama}
+                amount={res.qyt}
+                price={res.harga}
+                key={index + 's'}
+              />
+            </>
+          );
+        }
+      });
+      dataAksesoris = this.state.dataView.aksesoris.map((res, index) => {
+        if (res.qyt != 0) {
+          return (
+            <>
+              <Text style={{fontWeight: 'bold'}}>Aksesoris</Text>
+              <ListBottom
+                title={res.nama}
+                amount={res.qyt}
+                price={res.harga * res.qyt}
+                key={index + 't'}
+              />
+            </>
+          );
+        }
+      });
+    } else {
+      if (this.state.dataView.length != 0 && this.state.tr_id !== null) {
+        dataCuciHelm = this.state.dataView.data.map((res, index) => {
+          return (
+            <>
+              <ListBottom
+                title={res.data_barang.nama}
+                amount={res.data_barang.qyt}
+                price={res.data_barang.harga}
+                key={index + 'a'}
+              />
+            </>
+          );
+        });
       }
-    });
-    dataAksesoris = this.state.dataView.aksesoris.map(res => {
-      if (res.qyt != 0) {
-        return (
-          <>
-            <Text style={{fontWeight: 'bold'}}>Aksesoris</Text>
-            <ListBottom
-              title={res.nama}
-              amount={res.qyt}
-              price={res.harga * res.qyt}
-            />
-          </>
-        );
-      }
-    });
+    }
+
     //   this.state.dataView.map(res=>{
 
     //   })
+    let dataCustomer;
 
+    if (this.state.tr_id == null) {
+      let date = IndonesiaDate(new Date());
+      dataCustomer = (
+        <View
+          style={[styles.cardWrap, {borderStyle: 'dotted', paddingBottom: 15}]}>
+          <ListTop
+            title={'' + date.tanggal + ' ' + date.bulan + ' ' + date.tahun}
+            content={this.state.tr_id}
+          />
+          <ListTop title={'Luna Maya'} content={'081239123'} />
+          <ListTop title={'luna@gmail.com'} content={'GRAB'} />
+
+          <ListTop title={'Kimochi Wallet -- Rp.3000'} />
+        </View>
+      );
+    } else {
+      if (this.state.dataView.length != 0) {
+        let date = IndonesiaDate(new Date(this.state.dataView.dll.create_at));
+        let data = this.state.dataView.customer;
+        console.log(data);
+        dataCustomer = (
+          <View
+            style={[
+              styles.cardWrap,
+              {borderStyle: 'dotted', paddingBottom: 15},
+            ]}>
+            <ListTop
+              title={'' + date.tanggal + ' ' + date.bulan + ' ' + date.tahun}
+              content={this.state.tr_id}
+            />
+            <ListTop title={data.nama_lengkap} content={data.no_telepon} />
+            <ListTop title={data.email} content={data.member} />
+
+            <ListTop title={'Kimochi Wallet --' + data.kimochi_wallet} />
+          </View>
+        );
+      }
+    }
     return (
       <>
         <DetailTop title="ORDER" />
@@ -185,20 +336,7 @@ export default class ShoppingCart extends Component {
           {menuTop}
 
           <ScrollView>
-            <View
-              style={[
-                styles.cardWrap,
-                {borderStyle: 'dotted', paddingBottom: 15},
-              ]}>
-              <ListTop
-                title={'' + date.tanggal + ' ' + date.bulan + ' ' + date.tahun}
-                content={this.state.tr_id}
-              />
-              <ListTop title={'Luna Maya'} content={'081239123'} />
-              <ListTop title={'luna@gmail.com'} content={'GRAB'} />
-
-              <ListTop title={'Kimochi Wallet -- Rp.3000'} />
-            </View>
+            {dataCustomer}
             {dataCuciHelm}
             {dataAksesoris}
             <ListBottom
@@ -216,9 +354,7 @@ export default class ShoppingCart extends Component {
               borderTopColor: '#cccccc',
               borderTopWidth: 1,
             }}>
-            <TouchableOpacity onPress={() => this.confirmPayment()}>
-              <BtnConfirm title="SAVE" />
-            </TouchableOpacity>
+            {btnConfirm}
           </View>
         </View>
       </>

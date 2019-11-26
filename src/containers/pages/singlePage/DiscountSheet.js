@@ -14,26 +14,31 @@ export default class DiscountSheet extends Component {
   }
   componentDidMount = async () => {
     await GetDiscount().then(res => {
-      console.log(res);
-      // this.setState({data: res});
+      this.setState({data: res.data.data});
     });
   };
   render() {
     const fun = this.props.navigation.state.params.fun;
     let discountCard;
     if (this.state.data.length != 0) {
-      let data = this.state.data.data.data;
-      discountCard = data.map(res => {
+      let data = this.state.data;
+      console.log(data);
+      discountCard = data.map((res, index) => {
         return (
           <DiscountCard
             title={res.nama}
             content={res.detail}
-            amount={'Rp.' + res.harga}
+            amount={res.kuota}
             fun={fun}
-            price={res.harga}
+            price={res.potongan}
+            key={index}
           />
         );
       });
+    } else {
+      discountCard = (
+        <Text style={{textAlign: 'center'}}>Maaf Diskon tidak tersedia</Text>
+      );
     }
     return (
       <>
@@ -47,49 +52,6 @@ export default class DiscountSheet extends Component {
           />
           <ScrollView style={{flex: 1, backgroundColor: 'white', padding: 20}}>
             {discountCard}
-
-            <DiscountCard
-              title={'Voucher Diskon Agustus'}
-              content={'Syarat menunjukkan KTP Kemudian KTP di Foto'}
-              amount={'Rp.5000'}
-              fun={fun}
-              price={5000}
-            />
-            <DiscountCard
-              title={'Voucher Diskon Agustus'}
-              content={'Syarat menunjukkan KTP Kemudian KTP di Foto'}
-              amount={'Rp.5000'}
-              fun={fun}
-              price={5000}
-            />
-            <DiscountCard
-              title={'Voucher Diskon Agustus'}
-              content={'Syarat menunjukkan KTP Kemudian KTP di Foto'}
-              amount={'Rp.5000'}
-              fun={fun}
-              price={5000}
-            />
-            <DiscountCard
-              title={'Voucher Diskon Agustus'}
-              content={'Syarat menunjukkan KTP Kemudian KTP di Foto'}
-              amount={'Rp.5000'}
-              fun={fun}
-              price={5000}
-            />
-            <DiscountCard
-              title={'Voucher Diskon Agustus'}
-              content={'Syarat menunjukkan KTP Kemudian KTP di Foto'}
-              amount={'Rp.5000'}
-              fun={fun}
-              price={5000}
-            />
-            <DiscountCard
-              title={'Voucher Diskon Agustus'}
-              content={'Syarat menunjukkan KTP Kemudian KTP di Foto'}
-              amount={'Rp.5000'}
-              fun={fun}
-              price={5000}
-            />
           </ScrollView>
         </View>
       </>
@@ -98,6 +60,12 @@ export default class DiscountSheet extends Component {
 }
 
 const DiscountCard = props => {
+  let price;
+  if (props.price < 1) {
+    price = props.price * 100 + '%';
+  } else {
+    price = 'Rp. ' + props.price;
+  }
   return (
     <View style={styles.discountCard}>
       <View style={{flex: 2}}>
@@ -108,7 +76,7 @@ const DiscountCard = props => {
       </View>
       <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
         <Text style={{color: '#fB5516', fontWeight: 'bold', fontSize: 22}}>
-          {props.amount}
+          {price}
         </Text>
         <View
           style={{

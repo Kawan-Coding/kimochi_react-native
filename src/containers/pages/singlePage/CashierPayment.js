@@ -17,6 +17,13 @@ import Voucher from '../../../assets/img/voucher.png';
 import Bill from '../../../assets/img/bill.png';
 import Money from '../../../assets/img/money.png';
 import Checked from '../../../assets/img/checked.png';
+import {GetBarangTrId} from '../../../config/service/Barang';
+import {GetItem} from '../../../config/service/Storage';
+import {
+  savePayment,
+  SavePayment,
+  SetPayment,
+} from '../../../config/service/Transaction';
 
 import KimochiModal from '../../../component/KimochiModal';
 
@@ -24,11 +31,14 @@ export default class CashierPayment extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      totalAwal: 20000,
-      totalAkhir: 18000,
+      tr_id: this.props.navigation.state.params.tr_id,
+      data: [],
+      total: 0,
+      totalAwal: 0,
+      kembalian: 0,
       discountVisible: false,
       discountChoosen: false,
-      discountValue: 0,
+      discountValue: null,
       discountCardText: '',
       couponVisible: false,
       couponChoosen: false,
@@ -36,8 +46,8 @@ export default class CashierPayment extends Component {
       couponCardText: '',
       paymentVisible: false,
       paymentChoosen: false,
-      paymentValue: '',
-      paymentCardText: '',
+      paymentValue: null,
+      paymentCardText: [],
       isModalVisible: false,
     };
     this.changeDiscountVisibility = this.changeDiscountVisibility.bind(this);
@@ -55,12 +65,17 @@ export default class CashierPayment extends Component {
     this.setState({discountVisible: visible});
   };
   chooseDiscount = (visible, discountValue, discountCardText) => {
-    this.changeDiscountVisibility(false);
-
+    let total = this.state.totalAwal;
+    if (discountValue < 1) {
+      total = this.state.totalAwal - discountValue * this.state.totalAwal;
+    } else {
+      total -= discountValue;
+    }
     this.setState({
       discountChoosen: visible,
       discountValue: discountValue,
       discountCardText: discountCardText,
+      total: total,
     });
     this.props.navigation.pop();
   };
@@ -68,8 +83,6 @@ export default class CashierPayment extends Component {
     this.setState({couponVisible: visible});
   };
   chooseCoupon = (visible, couponValue, couponCardText) => {
-    console.log('choose coupon');
-
     this.setState({
       couponChoosen: visible,
       couponValue: couponValue,
@@ -78,10 +91,20 @@ export default class CashierPayment extends Component {
     this.props.navigation.pop();
   };
   changePaymentVisibility = visible => {
-    this.setState({paymentVisible: visible});
+    this.setState({
+      paymentChoosen: visible,
+      paymentValue: discountValue,
+      paymentCardText: discountCardText,
+    });
   };
-  choosePayment = visible => {
-    this.setState({paymentChoosen: visible});
+  choosePayment = (visible, paymentValue, paymentCardText) => {
+    this.setState({
+      paymentChoosen: visible,
+      paymentValue: paymentValue,
+      paymentCardText: paymentCardText,
+      kembalian: paymentCardText.kembalian,
+    });
+    this.props.navigation.pop();
   };
   changeModalVisibility = bool => {
     this.setState({
@@ -92,13 +115,97 @@ export default class CashierPayment extends Component {
     console.log('confirm payment');
     this.changeModalVisibility(false);
   };
-  componentDidMount = () => {};
+  savePayment = async () => {
+    let tr_id = this.state.tr_id;
+    let metode_pembayaran_id = this.state.paymentCardText.id;
+    let diskon_id = this.state.discountValue;
+    let nominal_discount;
+    if (this.state.discountValue < 1) {
+      nominal_discount =
+        this.state.totalAwal - this.state.discountValue * this.state.totalAwal;
+    } else {
+      nominal_discount = this.state.totalAwal - this.state.discountValue;
+    }
+    let data_metode_pembayaran = {
+      media: this.state.paymentCardText.media,
+      no_rek: this.state.paymentCardText.no_rek,
+    };
+    let nominal = this.state.paymentCardText.nominal;
+    let dataSend = [];
+    if (diskon_id == null) {
+      let payment = {
+        metode_pembayaran_id: metode_pembayaran_id,
+        diskon_id: '0',
+        data_metode_pembayaran: data_metode_pembayaran,
+        nominal: nominal,
+      };
+      dataSend.push(payment);
+    } else {
+      let discount = {
+        metode_pembayaran_id: '50',
+        diskon_id: diskon_id,
+        nominal: nominal_discount,
+      };
+      let payment = {
+        metode_pembayaran_id: metode_pembayaran_id,
+        diskon_id: '0',
+        data_metode_pembayaran: data_metode_pembayaran,
+        nominal: nominal,
+      };
+      dataSend.push(discount);
+      dataSend.push(payment);
+    }
+
+    await SavePayment(tr_id, dataSend).then(async res => {
+      if (res.data.error) {
+        console.log(res.data);
+      } else {
+        console.log(res);
+        let cabang_id = await GetItem('cabang_id');
+        let responsible_id = await GetItem('id_responsible');
+
+        await SetPayment(
+          tr_id,
+          cabang_id,
+          this.state.data.customer.id,
+          responsible_id,
+        ).then(async res => {
+          if (res.data.error) {
+            console.log(res.data.msg);
+          } else {
+            console.log(res);
+            this.changeModalVisibility(true);
+          }
+        });
+      }
+    });
+  };
+  componentDidMount = async () => {
+    await GetBarangTrId(this.state.tr_id).then(res => {
+      if (res.data.error) {
+        console.log(res.data.msg);
+      } else {
+        let price = 0;
+        res.data.data.data.map(res => {
+          price += Number(res.data_barang.harga);
+        });
+        this.setState({
+          data: res.data.data,
+          totalAwal: price,
+          total: price,
+        });
+      }
+    });
+  };
   render() {
+    let data = this.state.data;
     let discountValue = 'Discount';
     let discountCardText = '';
     if (this.state.discountChoosen) {
       if (this.state.discountValue > 1) {
         discountValue = 'Rp. ' + this.state.discountValue;
+      } else {
+        discountValue = this.state.discountValue * this.state.totalAwal;
       }
 
       discountCardText = this.state.discountCardText;
@@ -107,7 +214,96 @@ export default class CashierPayment extends Component {
     let couponCardText = '';
 
     let paymentValue = 'Payment';
-    let paymentCardText = '';
+    let paymentCardText;
+    if (this.state.paymentCardText.length != 0) {
+      if (this.state.paymentCardText.type == 'NON-TUNAI') {
+        paymentValue = 'NON-TUNAI';
+        paymentCardText = (
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: '#b4debb',
+              borderRadius: 10,
+              borderWidth: 1,
+              borderColor: '#cccccc',
+              padding: 10,
+            }}>
+            <View style={{flexDirection: 'row'}}>
+              <View style={{flex: 1}}>
+                <Text>Bank</Text>
+              </View>
+              <View style={{flex: 2}}>
+                <Text>: {this.state.paymentCardText.media}</Text>
+              </View>
+            </View>
+            <View style={{flexDirection: 'row'}}>
+              <View style={{flex: 1}}>
+                <Text>No Rekening</Text>
+              </View>
+              <View style={{flex: 2}}>
+                <Text>: {this.state.paymentCardText.no_rek}</Text>
+              </View>
+            </View>
+          </View>
+        );
+      }
+      if (this.state.paymentCardText.type == 'TUNAI') {
+        paymentValue = 'TUNAI';
+        paymentCardText = (
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: '#b4debb',
+              borderRadius: 10,
+              borderWidth: 1,
+              borderColor: '#cccccc',
+              padding: 10,
+            }}>
+            <View style={{flexDirection: 'row'}}>
+              <View style={{flex: 1}}>
+                <Text>Cash</Text>
+              </View>
+              <View style={{flex: 2}}>
+                <Text>: Rp.{this.state.paymentCardText.nominal}</Text>
+              </View>
+            </View>
+            <View style={{flexDirection: 'row'}}>
+              <View style={{flex: 1}}>
+                <Text>Kembalian</Text>
+              </View>
+              <View style={{flex: 2}}>
+                <Text>: Rp.{this.state.kembalian}</Text>
+              </View>
+            </View>
+          </View>
+        );
+      }
+    }
+    let memberCard;
+    let bonusCard = <PaymentCard image={Money} type={'Bonus'} />;
+    if (this.state.data != 0) {
+      memberCard = (
+        <MemberCard
+          tr_id={this.state.tr_id}
+          total={this.state.totalAwal}
+          nama={data.customer.nama_lengkap}
+          cst_id={data.customer.id}
+          no_hp={data.customer.no_telepon}
+          member={data.customer.member}
+        />
+      );
+      bonusCard = (
+        <>
+          <PaymentCard
+            image={Money}
+            type={'Rp.' + this.state.data.total_kimochi_wallet}
+          />
+          <Text style={{fontSize: 12, color: 'purple'}}>
+            Bonus Kimochi Wallet
+          </Text>
+        </>
+      );
+    }
     return (
       <>
         {/* <View
@@ -120,14 +316,7 @@ export default class CashierPayment extends Component {
         <DetailTop title="Cashier-Payment" />
         <View style={{padding: 10, flex: 1, zIndex: 1}}>
           <ScrollView style={{flex: 1}}>
-            <MemberCard
-              tr_id={'TO_1234567'}
-              total={this.state.totalAwal}
-              nama={'Kawan Koding'}
-              cst_id={'ID_1234567'}
-              no_hp={'08123939'}
-              member={'Member Honda Kartika Sari'}
-            />
+            {memberCard}
             <TouchableOpacity
               onPress={() =>
                 this.props.navigation.navigate('DiscountSheet', {
@@ -138,34 +327,38 @@ export default class CashierPayment extends Component {
             </TouchableOpacity>
             <Text
               style={{
+                fontSize: 12,
                 color: 'purple',
                 display: this.state.discountChoosen ? 'flex' : 'none',
               }}>
               {discountCardText}
             </Text>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={() =>
                 this.props.navigation.navigate('CouponSheet', {
                   function: this.chooseCoupon,
                 })
               }>
               <PaymentCard image={Voucher} type={couponValue} />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <TouchableOpacity
               onPress={() =>
                 this.props.navigation.navigate('PaymentSheet', {
-                  function: this.choosePayment,
+                  fun: this.choosePayment,
+                  total: this.state.total,
                 })
               }>
               <PaymentCard image={Bill} type={paymentValue} />
             </TouchableOpacity>
-            <PaymentCard image={Money} type={'Bonus'} />
+            {paymentCardText}
+            {bonusCard}
           </ScrollView>
         </View>
+
         <PaymentBtn
-          total={this.state.totalAkhir}
-          kembalian={this.state.totalAwal - this.state.totalAkhir}
-          function={this.changeModalVisibility}
+          total={this.state.total}
+          kembalian={this.state.kembalian}
+          function={this.savePayment}
         />
 
         {/* <View
@@ -180,11 +373,12 @@ export default class CashierPayment extends Component {
           opacity={this.state.isModalVisible}
           hide={() => this.changeModalVisibility}
           message={
-            'Pembayaran telah berhasil dilakukan \n\n Apakah customer telah menerima barang?'
+            'Pembayaran telah berhasil dilakukan \n\n Tolong ingatkan customer untuk mengambil barang'
           }
           icon={Checked}
           option={true}
-          function={this.confirmPayment}
+          function={this.props.navigation.navigate}
+          page={'Home'}
         />
       </>
     );
@@ -230,14 +424,17 @@ const PaymentCard = props => {
 
   if (props.type == 'Discount') {
     bgPayment.backgroundColor = 'red';
-  }
-  if (props.type == 'Coupon') {
+  } else if (props.type == 'Coupon') {
     bgPayment.backgroundColor = 'purple';
-  }
-  if (props.type == 'Payment') {
+  } else if (props.type == 'Payment') {
     bgPayment.backgroundColor = 'green';
-  }
-  if (props.type == 'Bonus') {
+  } else if (props.type == 'Bonus') {
+    bgPayment.backgroundColor = 'orange';
+  } else if (props.type == 'TUNAI') {
+    bgPayment.backgroundColor = 'green';
+  } else if (props.type == 'NON-TUNAI') {
+    bgPayment.backgroundColor = 'green';
+  } else {
     bgPayment.backgroundColor = 'orange';
   }
   return (

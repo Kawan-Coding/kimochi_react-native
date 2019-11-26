@@ -19,6 +19,7 @@ export default class CuciHelm extends Component {
       kondisi: null,
       foto_helm: null,
     };
+    console.log(this.props.navigation.state.params);
   }
   jenisHandler = val => {
     this.setState({jenis_helm: val});
@@ -44,12 +45,18 @@ export default class CuciHelm extends Component {
     //   type: 'image/jpg',
     // };
 
-    let data_foto = new FormData();
-    data_foto.append({
-      uri: data.foto_helm.path,
+    // let data_foto = new FormData();
+    // data_foto.append({
+    //   uri: data.foto_helm.path,
+    //   name: 'foto_helm.jpg',
+    //   type: 'image/jpg',
+    // });
+
+    let data_foto = {
+      uri: 'file://' + data.foto_helm.path,
       name: 'foto_helm.jpg',
       type: 'image/jpg',
-    });
+    };
     // data_foto = JSON.stringify(data_foto);
 
     let kondisi =
@@ -71,15 +78,15 @@ export default class CuciHelm extends Component {
       jenis_transaksi +
       '","kondisi":' +
       kondisi +
-      ',"foto_helm":"' +
-      data_foto +
-      '"}';
+      ',"foto_helm":"eyaa"}';
 
     let fun = this.props.navigation.state.params.fun;
+    let fun2 = this.props.navigation.state.params.fun2;
     console.log(dataSend);
     dataSend = JSON.parse(dataSend);
     console.log(dataSend);
     await fun(dataSend);
+    await fun2(data_foto);
     this.props.navigation.pop();
   };
   handleImage = () => {

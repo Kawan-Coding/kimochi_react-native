@@ -14,4 +14,11 @@ const GetAllBooking = async cabang_id => {
   return await RequestPost(url, data);
 };
 
-export {GetAllOrder, GetAllBooking};
+const GetBarangTrId = async tr_id => {
+  const url = 'api/ato/read';
+  let data = new FormData();
+  data.append('tr_id', tr_id);
+  return await RequestPost(url, data);
+};
+
+export {GetAllOrder, GetAllBooking, GetBarangTrId};

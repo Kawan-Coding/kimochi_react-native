@@ -78,8 +78,9 @@ export default class Order extends Component {
               tr_id={res.tr_id}
               data_customer={res.data_customer}
               customer_id={res.customer_id}
-              telephone={'0909898'}
-              link={'StatusOrder'}
+              telephone={res.data_customer.no_telepon}
+              link={this.props.navigation.navigate}
+              page={'StatusOrder'}
               key={res.taking_order_id}
               // onPress={this.modalTrigger()}
             />
@@ -96,7 +97,8 @@ export default class Order extends Component {
               data_customer={res.data_customer}
               customer_id={res.customer_id}
               telephone={'0909898'}
-              link={'ScanBooking'}
+              link={this.props.navigation.navigate}
+              page={'ScanBooking'}
               key={res.taking_order_id}
               // onPress={this.modalTrigger()}
             />

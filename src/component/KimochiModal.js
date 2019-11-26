@@ -47,6 +47,12 @@ export default class KimochiModal extends Component {
             </View>
             <View style={styles.modalContent}>
               <Text>{this.props.message}</Text>
+              <TouchableOpacity
+                onPress={() => this.props.function(this.props.page)}>
+                <View style={styles.modalBtn}>
+                  <Text style={styles.btnText}>OK</Text>
+                </View>
+              </TouchableOpacity>
             </View>
           </View>
         </>
