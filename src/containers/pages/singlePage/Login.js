@@ -35,6 +35,7 @@ class Login extends Component {
   };
   LoginService = async (username, password) => {
     await Auth(username, password).then(async result => {
+      console.log(result.data.data);
       if (result.data.error == false) {
         this.changeInvalid(false);
         try {
@@ -46,6 +47,7 @@ class Login extends Component {
           await SetItem('nama_lengkap', data.responsible.pegawai.nama_lengkap);
           await SetItem('no_telepon', data.responsible.pegawai.no_telepon);
           await SetItem('foto', data.responsible.pegawai.foto);
+          // await SetItem('email', data.responsible.pegawai.email);
           await SetItem('create_at', data.responsible.pegawai.create_at);
           await SetItem('cabang_id', data.responsible.cabang.id);
           await SetItem('cabang_nama', data.responsible.cabang.nama);
@@ -62,6 +64,7 @@ class Login extends Component {
 
           await SetItem('role', data.responsible.cabang.role).then(() => {
             if (cashStatus == 'unvalidated') {
+              console.log('masuk unvalidated');
               this.props.navigation.navigate('ValidationCheck');
             }
             if (cashStatus == 'progress') {
@@ -76,6 +79,9 @@ class Login extends Component {
         }
       } else {
         this.changeInvalid(true);
+        setTimeout(() => {
+          this.changeInvalid(false);
+        }, 3000);
       }
     });
     // this.state.data = dataService.data;

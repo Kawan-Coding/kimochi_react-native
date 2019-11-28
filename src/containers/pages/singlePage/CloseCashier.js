@@ -38,7 +38,8 @@ export default class CloseCashier extends Component {
   };
 
   closeCashier = async () => {
-    const id = await AsyncStorage.getItem('cash_flow_id');
+    const id = await GetItem('cash_flow_id');
+
     const close_cash = this.state.number;
     console.log(close_cash);
     await CloseCashierService(id, close_cash).then(async res => {
@@ -61,13 +62,13 @@ export default class CloseCashier extends Component {
   getZone = () => {
     var date = IndonesiaDate(new Date());
 
-    if (Date.jam >= 0 && date.jam < 12) {
+    if (date.jam >= 0 && date.jam < 12) {
       this.setState({zona: 'pagi'});
     }
-    if (Date.jam >= 12 && date.jam < 18) {
+    if (date.jam >= 12 && date.jam < 18) {
       this.setState({zona: 'siang'});
     }
-    if (Date.jam >= 18 && date.jam <= 24) {
+    if (date.jam >= 18 && date.jam <= 24) {
       this.setState({zona: 'malam'});
     }
   };
@@ -101,7 +102,9 @@ export default class CloseCashier extends Component {
                   textAlign: 'right',
                 }}>
                 Selamat {this.state.zona + '\n'}
-                <Text style={{color: 'white'}}>{this.state.nama_lengkap}</Text>
+                <Text style={{color: 'white', fontWeight: 'bold'}}>
+                  {this.state.nama_lengkap}
+                </Text>
                 {'\n'}Selamat Bekerja
               </Text>
             </View>

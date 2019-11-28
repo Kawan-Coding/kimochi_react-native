@@ -32,15 +32,19 @@ export default class TransaksiHariIni extends Component {
     let head3;
     if (this.state.data.length != 0) {
       data = this.state.data;
-      bill = <TransaksiCard data={this.state.data.data_order} />;
+      let tunai = 0;
+      let non_tunai = 0;
+      // console.log(data[0].data_payment);
+      bill = data.map((item, index) => {
+        tunai += Number(item.tunai);
+        non_tunai += Number(item.non_tunai);
+        return <TransaksiCard data={item} key={index + 's'} />;
+      });
       head1 = (
-        <HeaderItem
-          title={'Total Transaksi'}
-          amount={data.data_order.taking_order.length.toString()}
-        />
+        <HeaderItem title={'Total Transaksi'} amount={'' + data.length} />
       );
-      head2 = <HeaderItem title={'Tunai'} amount={data.tunai} />;
-      head3 = <HeaderItem title={'Tunai'} amount={data.non_tunai} />;
+      head2 = <HeaderItem title={'Tunai'} amount={tunai} />;
+      head3 = <HeaderItem title={'Non Tunai'} amount={non_tunai} />;
     } else {
       bill = <Text>Belum ada transaksi hari ini</Text>;
     }
@@ -65,24 +69,24 @@ export default class TransaksiHariIni extends Component {
 const TransaksiCard = props => {
   return (
     <>
-      <View style={{flexDirection: 'row'}}>
+      <View style={{flexDirection: 'row', marginTop: 20}}>
         <View style={{flex: 3}}>
           <View style={{flexDirection: 'row'}}>
             <View style={{flex: 2}}>
               <Text>{props.data.tr_id}</Text>
             </View>
             <View style={{flex: 1}}>
-              <Text>{props.data.name}</Text>
+              <Text>{props.data.data_customer.customer.nama_lengkap}</Text>
             </View>
           </View>
 
-          {props.data.order.map(order => {
+          {props.data.data_order.taking_order.map((order, index) => {
             return (
               <TransaksiDetail
-                product_name={order.product_name}
-                amount={order.amount}
-                price={order.price}
-                key={order.id}
+                product_name={order.data_barang.nama}
+                amount={order.qyt}
+                price={order.data_barang.harga}
+                key={index + 'r'}
               />
             );
           })}
@@ -93,8 +97,14 @@ const TransaksiCard = props => {
             alignItems: 'center',
             justifyContent: 'flex-end',
           }}>
-          <Text style={styles.detailRight}>Ovo</Text>
-          <Text style={styles.detailRight}>Rp. 50.000</Text>
+          {props.data.data_payment.metode_pembayaran.map((item, index) => {
+            return (
+              <>
+                <Text style={styles.detailRight}>{item.nama}</Text>
+                <Text style={styles.detailRight}>Rp. {item.nominal}</Text>
+              </>
+            );
+          })}
         </View>
       </View>
     </>

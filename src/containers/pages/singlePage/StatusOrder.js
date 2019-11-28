@@ -29,6 +29,7 @@ export default class StatusOrder extends Component {
   }
   componentDidMount = async () => {
     await GetBarangTrId(this.state.tr_id).then(res => {
+      console.log(res.data.data);
       if (res.data.error) {
         console.log(res.data.msg);
       } else {
@@ -47,6 +48,9 @@ export default class StatusOrder extends Component {
   };
   displayModal = bool => {
     this.setState({isModalVisible: bool});
+  };
+  confirmBtn = () => {
+    this.props.navigation.push('Order');
   };
   saveTransaction = async () => {
     if (this.state.process_status == 'process') {
@@ -86,7 +90,7 @@ export default class StatusOrder extends Component {
             }
             icon={checked}
             option={false}
-            function={this.props.navigation.pop}
+            function={this.confirmBtn}
           />
         );
         saveBtn = (
@@ -108,7 +112,7 @@ export default class StatusOrder extends Component {
             }
             icon={cancel}
             option={false}
-            function={this.props.navigation.pop}
+            function={this.confirmBtn}
           />
         );
         saveBtn = (
@@ -130,7 +134,7 @@ export default class StatusOrder extends Component {
             }
             icon={checked}
             option={false}
-            function={this.props.navigation.pop}
+            function={this.confirmBtn}
           />
         );
         saveBtn = (
@@ -152,7 +156,7 @@ export default class StatusOrder extends Component {
             }
             icon={checked}
             option={false}
-            function={this.props.navigation.pop}
+            function={this.confirmBtn}
           />
         );
         saveBtn = (
@@ -167,7 +171,7 @@ export default class StatusOrder extends Component {
           <StatusOrderCard
             name={data.customer.nama_lengkap}
             number={data.customer.no_telepon}
-            history={'3'}
+            history={data.customer.history_transaksi}
             member={data.customer.member}
           />
           <ScrollView>
@@ -246,18 +250,18 @@ const OrderList = props => {
       </Text>
     );
   }
-  let date = IndonesiaDate(new Date(props.date));
+  let date = IndonesiaDate(new Date(props.data.dll.create_at));
   let data = props.data;
   let listBarang;
 
-  listBarang = data.data.map(res => {
+  listBarang = data.data.map((res, index) => {
     return (
       <>
         <ListBottom
           title={res.data_barang.nama}
           amount={res.qyt}
           price={res.data_barang.harga}
-          key={res.id}
+          key={index + 's'}
         />
       </>
     );

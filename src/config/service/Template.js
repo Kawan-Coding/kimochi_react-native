@@ -1,6 +1,8 @@
 import axios from 'axios';
 const BaseUrl = 'https://kawankoding.kampungbudaya.com/';
 const BaseUrlPhoto = 'https://kawankoding.kampungbudaya.com/uploads/';
+const BaseUrlPhotoNotifikasi =
+  'https://kawankoding.kampungbudaya.com/uploads/notifikasi/';
 
 const RequestPost = async (url, data) => {
   return await axios({
@@ -55,4 +57,11 @@ const RequestPostOrder = async (url, data) => {
     });
 };
 
-export {RequestPost, RequestGet, RequestPostOrder, BaseUrl, BaseUrlPhoto};
+export {
+  RequestPost,
+  RequestGet,
+  RequestPostOrder,
+  BaseUrl,
+  BaseUrlPhoto,
+  BaseUrlPhotoNotifikasi,
+};

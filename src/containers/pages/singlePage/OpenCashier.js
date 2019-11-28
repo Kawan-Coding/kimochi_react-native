@@ -44,23 +44,22 @@ export default class OpenCashier extends Component {
     await GetItem('id').then(res => {
       id = res;
     });
-    console.log(id_responsible);
-    console.log(id);
+
     // let open_cash = this.state.number;
     // console.log(open_cash);
     await OpenCashierService(id_responsible, this.state.number, id).then(
       async result => {
-        console.log(result);
         if (result.data.error) {
           this.changeInvalid(true);
         } else {
+          await SetItem('cash_flow_id', result.data.data.id);
           this.props.navigation.navigate('Home');
         }
       },
     );
   };
   componentDidMount = async () => {
-    await AsyncStorage.getItem('nama_lengkap').then(res => {
+    await GetItem('nama_lengkap').then(res => {
       this.setState({nama_lengkap: res});
     });
   };

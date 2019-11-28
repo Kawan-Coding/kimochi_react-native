@@ -14,6 +14,7 @@ export default class DiscountSheet extends Component {
   }
   componentDidMount = async () => {
     await GetDiscount().then(res => {
+      console.log(res.data.data);
       this.setState({data: res.data.data});
     });
   };
@@ -32,6 +33,7 @@ export default class DiscountSheet extends Component {
             fun={fun}
             price={res.potongan}
             key={index}
+            id={res.id}
           />
         );
       });
@@ -87,7 +89,7 @@ const DiscountCard = props => {
             marginTop: 10,
           }}>
           <TouchableOpacity
-            onPress={() => props.fun(true, props.price, props.title)}>
+            onPress={() => props.fun(true, props.price, props.title, props.id)}>
             <Text
               style={{textAlign: 'center', color: 'white', fontWeight: 'bold'}}>
               Pilih

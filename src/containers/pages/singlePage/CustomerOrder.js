@@ -10,6 +10,8 @@ import {
   GetDataBarang,
   GetDataBarangTrId,
 } from '../../../config/service/Customer';
+import {SetTakingOrderTrId} from '../../../config/service/Transaction';
+import {GetItem} from '../../../config/service/Storage';
 import {BaseUrlPhoto} from '../../../config/service/Template';
 
 export default class CustomerOrder extends Component {
@@ -135,7 +137,7 @@ export default class CustomerOrder extends Component {
     let count = 0;
     if (this.state.dataSend.length != 0) {
       this.state.dataSend.map(res => {
-        console.log(res.qyt);
+        console.log(count);
         count += res.qyt;
 
         // console.log(res.qyt);
@@ -144,7 +146,7 @@ export default class CustomerOrder extends Component {
 
     return count;
   };
-  cartResult = () => {
+  cartResult = async () => {
     if (this.getCount() == 0) {
       Alert.alert(
         'Maaf',
@@ -153,17 +155,50 @@ export default class CustomerOrder extends Component {
         {cancelable: false},
       );
     } else {
-      let dataSend = this.state.dataSend;
-      let dataView = this.state.dataView;
-      let dataFoto = this.state.dataFoto;
-      dataSend = this.zeroFilter(dataSend);
-      console.log(dataSend);
-      this.props.navigation.navigate('ShoppingCart', {
-        dataView: dataView,
-        dataSend: dataSend,
-        dataFoto: dataFoto,
-        customer_id: this.state.customer_id,
-      });
+      if (this.state.tr_id === undefined) {
+        let dataSend = this.state.dataSend;
+        let dataView = this.state.dataView;
+        let dataFoto = this.state.dataFoto;
+        dataSend = this.zeroFilter(dataSend);
+        console.log(dataSend);
+        this.props.navigation.navigate('ShoppingCart', {
+          dataView: dataView,
+          dataSend: dataSend,
+          dataFoto: dataFoto,
+          customer_id: this.state.customer_id,
+        });
+      } else {
+        let tr_id = this.state.tr_id;
+        let cabang_id;
+        let customer_id = this.state.customer_id;
+        let dataView = this.state.dataView;
+        let dataSend = this.state.dataSend;
+        let dataSend2 = this.state.dataSend;
+        let dataFoto = this.state.dataFoto;
+        dataSend = this.zeroFilter(dataSend);
+        dataSend = JSON.stringify(dataSend);
+
+        await GetItem('cabang_id').then(res => {
+          cabang_id = res;
+        });
+        await SetTakingOrderTrId(
+          tr_id,
+          cabang_id,
+          customer_id,
+          'order',
+          dataSend,
+          dataFoto,
+        ).then(res => {
+          console.log(dataView);
+          console.log(res.data.data.tr_id);
+          this.props.navigation.push('ShoppingCart', {
+            dataView: [],
+            dataSend: dataSend2,
+            customer_id: customer_id,
+            tr_id: res.data.data.tr_id,
+          });
+        });
+      }
     }
   };
   zeroFilter = arr => {
@@ -176,19 +211,25 @@ export default class CustomerOrder extends Component {
     return data;
   };
   componentDidMount = async () => {
+    let cabang_id;
+    await GetItem('cabang_id').then(res => {
+      cabang_id = res;
+    });
     if (this.state.tr_id === undefined) {
       console.log('masuk undefined');
-      await GetDataBarang().then(res => {
+
+      await GetDataBarang(cabang_id).then(res => {
         if (res.data.error) {
           console.log('API error');
         } else {
+          console.log(res.data.data);
           this.setState({dataView: res.data.data});
         }
       });
     }
     if (this.state.tr_id != undefined) {
       console.log('masuk sini');
-      await GetDataBarangTrId(this.state.tr_id).then(res => {
+      await GetDataBarangTrId(this.state.tr_id, cabang_id).then(res => {
         console.log(res);
         if (res.data.error) {
           console.log('API error');
@@ -198,18 +239,31 @@ export default class CustomerOrder extends Component {
           if (res.data.data.cuci_helm.length != 0) {
             res.data.data.cuci_helm.map(result => {
               if (result.qyt != 0) {
-                dataSend.push(result);
+                let temp = {
+                  barang_id: result.id,
+                  qyt: result.qyt,
+                  jenis_transaksi: 'cuci_helm',
+                  kondisi: result.kondisi,
+                  foto_helm: result.foto_helm,
+                };
+                dataSend.push(temp);
               }
             });
           }
           if (res.data.data.aksesoris.length != 0) {
             res.data.data.aksesoris.map(result => {
               if (result.qyt != 0) {
-                dataSend.push(result);
+                let temp = {
+                  barang_id: result.id,
+                  qyt: result.qyt,
+                  jenis_transaksi: 'aksesoris',
+                };
+                dataSend.push(temp);
               }
             });
           }
           this.setState({dataView: res.data.data, dataSend: dataSend});
+          console.log(this.state.dataSend);
         }
       });
     }
@@ -243,43 +297,47 @@ export default class CustomerOrder extends Component {
     let serviceCard;
     if (this.state.dataView.length != 0) {
       if (this.state.tabStatus) {
-        serviceCard = this.state.dataView.cuci_helm.map(res => {
-          return (
-            <ServiceCard
-              title={res.nama}
-              detail={res.detail}
-              price={res.harga}
-              link={this.props.navigation.navigate}
-              page={'CuciHelm'}
-              params={res.id}
-              key={res.id}
-              qyt={res.qyt}
-              image={BaseUrlPhoto + res.foto}
-              wallet={res.kimochi_wallet}
-              fun={this.dataSendHandlerCuci}
-              fun2={this.addDataFoto}
-            />
-          );
-        });
+        if (this.state.dataView.cuci_helm != undefined) {
+          serviceCard = this.state.dataView.cuci_helm.map(res => {
+            return (
+              <ServiceCard
+                title={res.nama}
+                detail={res.detail}
+                price={res.harga}
+                link={this.props.navigation.navigate}
+                page={'CuciHelm'}
+                params={res.id}
+                key={res.id}
+                qyt={res.qyt}
+                image={BaseUrlPhoto + res.foto}
+                wallet={res.kimochi_wallet}
+                fun={this.dataSendHandlerCuci}
+                fun2={this.addDataFoto}
+              />
+            );
+          });
+        }
       } else {
-        serviceCard = this.state.dataView.aksesoris.map(res => {
-          return (
-            <ServiceCard
-              title={res.nama}
-              detail={res.detail}
-              price={res.harga}
-              link={this.props.navigation.navigate}
-              page={'Aksesoris'}
-              params={res.id}
-              key={res.id}
-              qyt={res.qyt}
-              image={BaseUrlPhoto + res.foto}
-              wallet={res.kimochi_wallet}
-              fun={this.dataSendHandlerAksesoris}
-              fun2={this.addDataFoto}
-            />
-          );
-        });
+        if (this.state.dataView.aksesoris != undefined) {
+          serviceCard = this.state.dataView.aksesoris.map(res => {
+            return (
+              <ServiceCard
+                title={res.nama}
+                detail={res.detail}
+                price={res.harga}
+                link={this.props.navigation.navigate}
+                page={'Aksesoris'}
+                params={res.id}
+                key={res.id}
+                qyt={res.qyt}
+                image={BaseUrlPhoto + res.foto}
+                wallet={res.kimochi_wallet}
+                fun={this.dataSendHandlerAksesoris}
+                fun2={this.addDataFoto}
+              />
+            );
+          });
+        }
       }
     }
 

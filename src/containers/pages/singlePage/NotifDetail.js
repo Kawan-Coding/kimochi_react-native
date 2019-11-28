@@ -7,6 +7,7 @@ import {ScrollView} from 'react-native-gesture-handler';
 import Deal from '../../../assets/img/deal.jpg';
 import DetailTop from '../../../component/DetailTop';
 import {GetSingleNotif} from '../../../config/service/Notification';
+import {BaseUrlPhotoNotifikasi} from '../../../config/service/Template';
 
 export default class NotifDetail extends Component {
   constructor(props) {
@@ -38,7 +39,7 @@ export default class NotifDetail extends Component {
           <View>
             <Image
               source={{
-                uri: 'https://kawankoding.kampungbudaya.com/uploads/' + image,
+                uri: BaseUrlPhotoNotifikasi + image,
               }}
               style={{width: '100%', height: 300}}
             />

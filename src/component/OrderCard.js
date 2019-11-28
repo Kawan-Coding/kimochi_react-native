@@ -42,6 +42,7 @@ const OrderCard = props => {
         onPress={() =>
           props.link(props.page, {
             tr_id: props.tr_id,
+            customer_id: props.customer_id,
             transaction_status: props.transaction_status,
             dataSend: props.dataSend,
             dataView: props.dataView,

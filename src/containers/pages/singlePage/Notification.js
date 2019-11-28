@@ -28,14 +28,14 @@ export default class Notification extends Component {
     let notifCard;
     if (this.state.data.length != 0) {
       let data = this.state.data.data.data;
-      notifCard = data.map(res => {
+      notifCard = data.map((res, index) => {
         return (
           <>
             <NotifCard
               title={res.judul}
               content={res.detail}
               create_at={res.create_at}
-              key={res.id}
+              key={index + 's'}
               id={res.id}
             />
           </>

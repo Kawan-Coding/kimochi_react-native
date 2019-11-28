@@ -4,6 +4,7 @@ import {View, Text, StyleSheet} from 'react-native';
 import DetailTop from '../../../component/DetailTop';
 import DataTopProfile from '../../../component/DataTopProfile';
 import {GetOmsetHariIni} from '../../../config/service/Transaction';
+import {GetItem} from '../../../config/service/Storage';
 import AsyncStorage from '@react-native-community/async-storage';
 import {IndonesiaDate} from '../../../config/utilities/IndonesiaDate';
 import {ScrollView} from 'react-native-gesture-handler';
@@ -16,10 +17,10 @@ export default class OmsetHariIni extends Component {
   }
   componentDidMount = async () => {
     let responsible_id;
-    await AsyncStorage.getItem('responsible_id').then(res => {
+    await GetItem('id_responsible').then(res => {
       responsible_id = res;
     });
-    await GetOmsetHariIni('3').then(res => {
+    await GetOmsetHariIni(responsible_id).then(res => {
       this.setState({data: res.data.data});
     });
   };

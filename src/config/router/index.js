@@ -1,5 +1,6 @@
 import {createAppContainer, createSwitchNavigator} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
+import {GetItem} from '../service/Storage';
 import AsyncStorage from '@react-native-community/async-storage';
 
 import {
@@ -31,6 +32,17 @@ import {
   CuciHelmKondisi,
   ShoppingCart,
 } from '../../containers/pages';
+
+let isLogin = true;
+// this.getId();
+
+// getId = async () => {
+//   await GetItem('id').then(res => {
+//     if (res != undefined) {
+//       isLogin = true;
+//     }
+//   });
+// };
 
 const HomeStack = createStackNavigator(
   {
@@ -114,7 +126,7 @@ const Router = createSwitchNavigator(
   },
   {
     headerMode: 'none',
-    initialRouteName: 'ProfileStack',
+    initialRouteName: isLogin ? 'HomeStack' : 'LoginStack',
   },
 );
 export default createAppContainer(Router);

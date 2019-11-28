@@ -44,6 +44,7 @@ export default class Home extends Component {
   };
   checkCustomer = async number => {
     await CheckCustomerNumber(number).then(result => {
+      console.log(result);
       if (result.data.error) {
         this.setState({modalStatus: 'unregistered'});
         this.displayModal();
@@ -122,7 +123,6 @@ export default class Home extends Component {
     };
     if (this.state.data.length != 0) {
       data = this.state.data;
-      console.log(data);
     }
     return (
       <>

@@ -23,7 +23,6 @@ export default class Cashier extends Component {
         if (result.data.error) {
           console.log(result.data.message);
         } else {
-          console.log(result);
           this.setState({data: result.data.data});
         }
       });

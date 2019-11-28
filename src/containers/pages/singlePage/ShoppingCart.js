@@ -9,6 +9,7 @@ import {IndonesiaDate} from '../../../config/utilities/IndonesiaDate';
 import {SetTakingOrder} from '../../../config/service/Transaction';
 import {GetItem} from '../../../config/service/Storage';
 import {GetBarangTrId} from '../../../config/service/Barang';
+import {GetCustomer} from '../../../config/service/Customer';
 
 export default class ShoppingCart extends Component {
   constructor(props) {
@@ -21,11 +22,13 @@ export default class ShoppingCart extends Component {
       customer_id: this.props.navigation.state.params.customer_id,
       isPaymentDone: false,
       tr_id: this.props.navigation.state.params.tr_id,
+      dataCustomer: null,
     };
   }
 
   getCount = () => {
     let count = 0;
+
     if (this.state.dataSend.length != 0) {
       this.state.dataSend.map(res => {
         count += res.qyt;
@@ -48,6 +51,12 @@ export default class ShoppingCart extends Component {
       this.trIdExist(this.state.tr_id);
     } else {
       console.log('tr id null');
+      await GetCustomer(this.state.customer_id).then(res => {
+        if (res.data.error) {
+          console.log(res.data.msg);
+        }
+        this.setState({dataCustomer: res.data.data});
+      });
       this.sumTotal();
     }
     // console.log(this.state.dataSend);
@@ -56,13 +65,12 @@ export default class ShoppingCart extends Component {
   trIdExist = async tr_id => {
     console.log('masuk sini');
     await GetBarangTrId(tr_id).then(res => {
-      console.log(res);
       if (res.data.error) {
         console.log(res.data.msg);
       } else {
         let price = 0;
         res.data.data.data.map(res => {
-          price += Number(res.data_barang.harga);
+          price += Number(res.data_barang.harga * res.qyt);
         });
         this.setState({
           dataView: res.data.data,
@@ -91,8 +99,8 @@ export default class ShoppingCart extends Component {
       let dataFoto = this.state.dataFoto;
       dataSend = JSON.stringify(dataSend);
       // dataFoto = JSON.stringify(dataFoto);
-      console.log(dataSend);
-      console.log(dataFoto);
+      // console.log(dataSend);
+      // console.log(dataFoto);
       await GetItem('cabang_id').then(res => {
         cabang_id = res;
       });
@@ -242,7 +250,7 @@ export default class ShoppingCart extends Component {
               <ListBottom
                 title={res.nama}
                 amount={res.qyt}
-                price={res.harga}
+                price={res.harga * res.qyt}
                 key={index + 's'}
               />
             </>
@@ -267,12 +275,14 @@ export default class ShoppingCart extends Component {
     } else {
       if (this.state.dataView.length != 0 && this.state.tr_id !== null) {
         dataCuciHelm = this.state.dataView.data.map((res, index) => {
+          let price = res.data_barang.harga * res.qyt;
+
           return (
             <>
               <ListBottom
                 title={res.data_barang.nama}
                 amount={res.data_barang.qyt}
-                price={res.data_barang.harga}
+                price={price}
                 key={index + 'a'}
               />
             </>
@@ -287,25 +297,35 @@ export default class ShoppingCart extends Component {
     let dataCustomer;
 
     if (this.state.tr_id == null) {
-      let date = IndonesiaDate(new Date());
-      dataCustomer = (
-        <View
-          style={[styles.cardWrap, {borderStyle: 'dotted', paddingBottom: 15}]}>
-          <ListTop
-            title={'' + date.tanggal + ' ' + date.bulan + ' ' + date.tahun}
-            content={this.state.tr_id}
-          />
-          <ListTop title={'Luna Maya'} content={'081239123'} />
-          <ListTop title={'luna@gmail.com'} content={'GRAB'} />
+      if (this.state.dataCustomer != null) {
+        let date = IndonesiaDate(new Date());
+        let dataCust = this.state.dataCustomer;
+        console.log(dataCustomer);
+        dataCustomer = (
+          <View
+            style={[
+              styles.cardWrap,
+              {borderStyle: 'dotted', paddingBottom: 15},
+            ]}>
+            <ListTop
+              title={'' + date.tanggal + ' ' + date.bulan + ' ' + date.tahun}
+              content={this.state.tr_id}
+            />
+            <ListTop
+              title={dataCust.nama_lengkap}
+              content={dataCust.no_telepon}
+            />
+            <ListTop title={dataCust.email} content={dataCust.member} />
 
-          <ListTop title={'Kimochi Wallet -- Rp.3000'} />
-        </View>
-      );
+            <ListTop title={'Kimochi Wallet -- ' + dataCust.kimochi_wallet} />
+          </View>
+        );
+      }
     } else {
       if (this.state.dataView.length != 0) {
         let date = IndonesiaDate(new Date(this.state.dataView.dll.create_at));
         let data = this.state.dataView.customer;
-        console.log(data);
+
         dataCustomer = (
           <View
             style={[
@@ -327,7 +347,7 @@ export default class ShoppingCart extends Component {
     return (
       <>
         <DetailTop title="ORDER" />
-        <StatusOrderCard id="8" />
+        <StatusOrderCard id={this.state.customer_id} />
         <View style={styles.container}>
           <View>
             <Text style={{fontWeight: 'bold'}}>KIMOCHI SERVICE</Text>

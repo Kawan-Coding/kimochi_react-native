@@ -51,13 +51,13 @@ export default class Profile extends Component {
                 <Text>{data.no_telepon}</Text>
               </View>
               <View style={styles.cardRight}>
-                <TouchableOpacity>
+                {/* <TouchableOpacity>
                   <Text style={{color: '#43Af4A', fontSize: 16}}>Edit</Text>
-                  {/* <Image
+                  <Image
                     source={edit}
                     style={{flex: 1, width: 25, alignSelf: 'center'}}
-                  /> */}
-                </TouchableOpacity>
+                  />
+                </TouchableOpacity> */}
               </View>
             </View>
             <View style={styles.accountMenu}>

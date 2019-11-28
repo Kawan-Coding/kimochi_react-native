@@ -17,7 +17,7 @@ export default class Aksesoris extends Component {
     super(props);
     this.state = {
       qyt: this.props.navigation.state.params.qyt,
-      warna: 'merah',
+      // warna: 'merah',
       barang_id: this.props.navigation.state.params.barang_id,
     };
   }
@@ -111,7 +111,7 @@ export default class Aksesoris extends Component {
                   </View>
                 </View>
               </View>
-              <View style={{flex: 1}}>
+              {/* <View style={{flex: 1}}>
                 <Text style={styles.labelText}>Warna</Text>
                 <Picker
                   style={{height: 25}}
@@ -122,7 +122,7 @@ export default class Aksesoris extends Component {
                   <Picker.Item label="Merah" value="Merah" />
                   <Picker.Item label="Kuning" value="Kuning" />
                 </Picker>
-              </View>
+              </View> */}
             </View>
             <View style={styles.contentCard}>
               <Text style={styles.titleText}>Spesifikasi</Text>

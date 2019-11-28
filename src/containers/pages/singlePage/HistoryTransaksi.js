@@ -48,7 +48,8 @@ export default class HIstoryTransaksi extends Component {
   getHistory = async () => {
     await GetItem('id_responsible').then(async res => {
       let date = IndonesiaDate(this.state.date);
-      date = '' + date.tahun + date.bulan + date.tanggal;
+      date = '' + date.tahun + '-' + date.bulanAngka + '-' + date.tanggal;
+      console.log(date);
       await GetHistoryTransaksi(res, date).then(res => {
         console.log(res);
         this.setState({data: res.data.data});

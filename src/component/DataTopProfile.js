@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 
 import {IndonesiaDate} from '../config/utilities/IndonesiaDate';
-import AsyncStorage from '@react-native-community/async-storage';
+import {GetItem} from '../config/service/Storage';
 export default class DataTopProfile extends Component {
   constructor(props) {
     super(props);
@@ -21,17 +21,20 @@ export default class DataTopProfile extends Component {
   // let email = 'fawwazdaffam99@gmail.com';
 
   componentDidMount = async () => {
-    await AsyncStorage.getItem('nama_lengkap').then(res => {
+    await GetItem('nama_lengkap').then(res => {
       this.setState({nama_lengkap: res});
     });
-    await AsyncStorage.getItem('role').then(res => {
+    await GetItem('role').then(res => {
       this.setState({role: res});
     });
-    await AsyncStorage.getItem('id').then(res => {
+    await GetItem('id').then(res => {
       this.setState({id: res});
     });
-    await AsyncStorage.getItem('no_telepon').then(res => {
+    await GetItem('no_telepon').then(res => {
       this.setState({no_telepon: res});
+    });
+    await GetItem('email').then(res => {
+      this.setState({email: res});
     });
   };
 

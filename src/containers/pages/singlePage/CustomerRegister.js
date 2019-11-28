@@ -1,6 +1,14 @@
 import React, {Component} from 'react';
 
-import {Text, TextInput, StyleSheet, View, Picker, Image} from 'react-native';
+import {
+  Text,
+  TextInput,
+  StyleSheet,
+  View,
+  Picker,
+  Image,
+  Alert,
+} from 'react-native';
 import DetailTop from '../../../component/DetailTop';
 import {IndonesiaDate} from '../../../config/utilities/IndonesiaDate';
 
@@ -88,7 +96,8 @@ export default class CustomerRegister extends Component {
     return [year, month, day].join('-');
   };
   register = async () => {
-    let date = this.formatdate(this.state.date);
+    let date = IndonesiaDate(this.state.date);
+    date = date.tahun + '-' + date.bulanAngka + '-' + date.tanggalAngka;
 
     console.log(date);
     // this.props.navigation.navigate('CustomerOrder');
@@ -100,7 +109,7 @@ export default class CustomerRegister extends Component {
       data.nama_lengkap,
       data.no_telepon,
       data.email,
-      data.tanggal_lahir,
+      date,
       data.kendaraan,
       data.plat_nomor,
       data.member,
@@ -109,6 +118,12 @@ export default class CustomerRegister extends Component {
       console.log(result);
       if (result.data.error) {
         console.log(result.data.msg);
+        Alert.alert(
+          'Maaf',
+          'No. Hp telah terdaftar, silahkan masukkan nomor yang lain',
+          [{text: 'OK', onPress: () => console.log('OK Pressed')}],
+          {cancelable: false},
+        );
       } else {
         this.props.navigation.navigate('CustomerOrder', {
           customer_id: result.data.data.id,

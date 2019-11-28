@@ -56,12 +56,12 @@ export default class PaymentSheet extends Component {
     this.setState({payment_method_choosen: true});
   };
   handleNominal = val => {
-    console.log(Number(this.state.nominal));
-    if (Number(this.state.nominal) > this.state.total) {
-      let kembalian = Number(this.state.nominal) - this.state.total;
+    console.log(Number(val));
+    if (Number(val) > this.state.total) {
+      let kembalian = Number(val) - this.state.total;
       this.setState({kembalian: kembalian});
       this.setState({nominal: val});
-    } else if (this.state.nominal == '') {
+    } else if (val == '') {
       this.setState({kembalian: 0});
       this.setState({nominal: val});
     } else {
@@ -158,16 +158,18 @@ export default class PaymentSheet extends Component {
     let reactModal;
     let nomor;
     if (this.state.method == 'non-tunai') {
-      option = (
-        <>
-          <Text style={{fontWeight: 'bold'}}>Jenis</Text>
-          <TouchableOpacity onPress={() => this.setReactModalVisible()}>
-            <View style={[styles.input, {justifyContent: 'center'}]}>
-              <Text>{this.state.payment_method_label}</Text>
-            </View>
-          </TouchableOpacity>
-        </>
-      );
+      if (this.state.payment_method.length != 0) {
+        option = (
+          <>
+            <Text style={{fontWeight: 'bold'}}>Jenis</Text>
+            <TouchableOpacity onPress={() => this.setReactModalVisible()}>
+              <View style={[styles.input, {justifyContent: 'center'}]}>
+                <Text>{this.state.payment_method_label}</Text>
+              </View>
+            </TouchableOpacity>
+          </>
+        );
+      }
     }
     if (
       this.state.payment_method_choosen == true &&

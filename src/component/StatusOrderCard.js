@@ -14,7 +14,10 @@ export class StatusOrderCard extends Component {
   }
   componentDidMount = async () => {
     await GetCustomer(this.state.id).then(res => {
-      this.setState({data: res.data});
+      if (res.data.error) {
+        console.log(res.data.msg);
+      }
+      this.setState({data: res.data.data});
     });
   };
   render() {
@@ -25,11 +28,12 @@ export class StatusOrderCard extends Component {
         nama_lengkap: '',
         foto: 'cia',
         no_telepon: '',
-        history: '',
+        history_transaksi: '',
         member: '',
       };
     } else {
-      data = this.state.data.data;
+      data = this.state.data;
+
       foto = BaseUrlPhoto + data.foto;
     }
 
@@ -48,7 +52,9 @@ export class StatusOrderCard extends Component {
               <View style={styles.contentInner}>
                 <View style={{flex: 1}}>
                   <Text style={{color: 'black'}}>History Transaksi</Text>
-                  <Text style={styles.textContent}>{data.history}</Text>
+                  <Text style={styles.textContent}>
+                    {data.history_transaksi}
+                  </Text>
                 </View>
                 <View style={{flex: 1}}>
                   <Text style={{color: 'black'}}>Status Member</Text>

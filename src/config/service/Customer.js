@@ -27,16 +27,17 @@ const AddCustomer = async (
   return await RequestPost(url, data);
 };
 
-const GetDataBarangTrId = async tr_id => {
+const GetDataBarangTrId = async (tr_id, cabang_id) => {
   const url = 'api/api_get/get_data_barang';
   let data = new FormData();
   data.append('tr_id', tr_id);
+  data.append('cabang_id', cabang_id);
   return await RequestPost(url, data);
 };
-const GetDataBarang = async () => {
+const GetDataBarang = async cabang_id => {
   const url = 'api/api_get/get_data_barang';
   let data = new FormData();
-  data.append('hiyah', 'hiyah');
+  data.append('cabang_id', cabang_id);
   return await RequestPost(url, data);
 };
 const GetCustomer = async id => {

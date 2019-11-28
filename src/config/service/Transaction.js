@@ -59,6 +59,35 @@ const SetTakingOrder = async (
   console.log(dataForm);
   return await RequestPostOrder(url, dataForm);
 };
+const SetTakingOrderTrId = async (
+  tr_id,
+  cabang_id,
+  customer_id,
+  status,
+  data,
+  dataFoto,
+) => {
+  const url = 'api/ato/set_booking';
+  let index = 0;
+  let dataForm = new FormData();
+  dataForm.append('tr_id', tr_id);
+  dataForm.append('cabang_id', cabang_id);
+  dataForm.append('customer_id', customer_id);
+  dataForm.append('status', status);
+  dataForm.append('data', data);
+  let foto = [];
+  // dataForm.append('data_foto', dataFoto);
+  dataFoto.map((element, index) => {
+    dataForm.append('img[' + index + ']', element);
+  });
+
+  // data.forEach(element => {
+  //   dataForm.append('data[' + index + ']', data);
+  //   index++;
+  // });
+  console.log(dataForm);
+  return await RequestPostOrder(url, dataForm);
+};
 const SetFinish = async tr_id => {
   const url = 'api/ato/set_status_to_finish';
   let data = new FormData();
@@ -86,13 +115,20 @@ const SavePayment = async (tr_id, dataPayment) => {
   console.log(data);
   return await RequestPost(url, data);
 };
-const SetPayment = async (tr_id, cabang_id, customer_id, responsible_id) => {
+const SetPayment = async (
+  tr_id,
+  cabang_id,
+  customer_id,
+  responsible_id,
+  kimochi_wallet_bonus,
+) => {
   const url = 'api/payment/create';
   let data = new FormData();
   data.append('tr_id', tr_id);
   data.append('cabang_id', cabang_id);
   data.append('customer_id', customer_id);
   data.append('responsible_id', responsible_id);
+  data.append('kimochi_wallet_bonus', kimochi_wallet_bonus);
 
   return await RequestPost(url, data);
 };
@@ -109,6 +145,7 @@ export {
   GetTransaksiHariIni,
   GetHistoryTransaksi,
   SetTakingOrder,
+  SetTakingOrderTrId,
   GetDiscount,
   SetFinish,
   GetPayment,

@@ -78,7 +78,9 @@ export default class CuciHelm extends Component {
       jenis_transaksi +
       '","kondisi":' +
       kondisi +
-      ',"foto_helm":"eyaa"}';
+      ',"foto_helm":' +
+      0 +
+      '}';
 
     let fun = this.props.navigation.state.params.fun;
     let fun2 = this.props.navigation.state.params.fun2;

@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Dimensions,
   TextInput,
+  Alert,
 } from 'react-native';
 
 import DetailTop from '../../../component/DetailTop';
@@ -39,6 +40,7 @@ export default class CashierPayment extends Component {
       discountVisible: false,
       discountChoosen: false,
       discountValue: null,
+      discountId: null,
       discountCardText: '',
       couponVisible: false,
       couponChoosen: false,
@@ -64,7 +66,7 @@ export default class CashierPayment extends Component {
   changeDiscountVisibility = visible => {
     this.setState({discountVisible: visible});
   };
-  chooseDiscount = (visible, discountValue, discountCardText) => {
+  chooseDiscount = (visible, discountValue, discountCardText, discountId) => {
     let total = this.state.totalAwal;
     if (discountValue < 1) {
       total = this.state.totalAwal - discountValue * this.state.totalAwal;
@@ -75,6 +77,7 @@ export default class CashierPayment extends Component {
       discountChoosen: visible,
       discountValue: discountValue,
       discountCardText: discountCardText,
+      discountId: discountId,
       total: total,
     });
     this.props.navigation.pop();
@@ -118,7 +121,7 @@ export default class CashierPayment extends Component {
   savePayment = async () => {
     let tr_id = this.state.tr_id;
     let metode_pembayaran_id = this.state.paymentCardText.id;
-    let diskon_id = this.state.discountValue;
+    let diskon_id = this.state.discountId;
     let nominal_discount;
     if (this.state.discountValue < 1) {
       nominal_discount =
@@ -130,7 +133,8 @@ export default class CashierPayment extends Component {
       media: this.state.paymentCardText.media,
       no_rek: this.state.paymentCardText.no_rek,
     };
-    let nominal = this.state.paymentCardText.nominal;
+    let nominal = this.state.total;
+
     let dataSend = [];
     if (diskon_id == null) {
       let payment = {
@@ -159,6 +163,12 @@ export default class CashierPayment extends Component {
     await SavePayment(tr_id, dataSend).then(async res => {
       if (res.data.error) {
         console.log(res.data);
+        Alert.alert(
+          'Maaf',
+          'Saldo tidak mencukupi',
+          [{text: 'OK', onPress: () => console.log('OK Pressed')}],
+          {cancelable: false},
+        );
       } else {
         console.log(res);
         let cabang_id = await GetItem('cabang_id');
@@ -169,9 +179,16 @@ export default class CashierPayment extends Component {
           cabang_id,
           this.state.data.customer.id,
           responsible_id,
+          this.state.data.total_kimochi_wallet,
         ).then(async res => {
           if (res.data.error) {
             console.log(res.data.msg);
+            Alert.alert(
+              'Maaf',
+              'Error sistem, silahkan hubungi Pak Wike (Nine Cloud)',
+              [{text: 'OK', onPress: () => console.log('OK Pressed')}],
+              {cancelable: false},
+            );
           } else {
             console.log(res);
             this.changeModalVisibility(true);
@@ -187,7 +204,7 @@ export default class CashierPayment extends Component {
       } else {
         let price = 0;
         res.data.data.data.map(res => {
-          price += Number(res.data_barang.harga);
+          price += Number(Number(res.data_barang.harga) * res.qyt);
         });
         this.setState({
           data: res.data.data,
@@ -290,6 +307,7 @@ export default class CashierPayment extends Component {
           cst_id={data.customer.id}
           no_hp={data.customer.no_telepon}
           member={data.customer.member}
+          kimochi_wallet={data.customer.kimochi_wallet}
         />
       );
       bonusCard = (
@@ -410,6 +428,13 @@ const MemberCard = props => {
           </View>
           <View style={{alignItems: 'flex-end', flex: 1}}>
             <Text style={{textAlign: 'right'}}>{props.member}</Text>
+          </View>
+        </View>
+        <View style={{flexDirection: 'row'}}>
+          <View>
+            <Text style={{color: 'purple', fontWeight: 'bold'}}>
+              Rp.{props.kimochi_wallet}
+            </Text>
           </View>
         </View>
       </View>

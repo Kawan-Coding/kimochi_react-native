@@ -17,7 +17,12 @@ const HeaderApp = props => {
           <View style={styles.headerItemsRound}>
             <TouchableOpacity
               onPress={() => props.navigation.navigate('CloseCashier')}>
-              <Image source={avatar} style={styles.avatar} />
+              <View style={{alignItems: 'center', justifyContent: 'center'}}>
+                <Text style={{fontSize: 12, color: 'red', fontWeight: 'bold'}}>
+                  Close
+                </Text>
+              </View>
+              {/* <Image source={avatar} style={styles.avatar} /> */}
             </TouchableOpacity>
           </View>
         </View>
